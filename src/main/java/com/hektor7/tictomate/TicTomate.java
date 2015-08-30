@@ -1,7 +1,10 @@
 package com.hektor7.tictomate;
 
 import com.sun.xml.internal.ws.util.StringUtils;
+import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.beans.property.LongProperty;
+import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
@@ -18,7 +21,18 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
+
 public class TicTomate extends Application {
+
+    Timer timer = new Timer();
+    TimerTask timerTask;
+    long workingSeconds = 0;
+    long restingSeconds = 0;
+    Label timerLabel = new Label();
+
 
     @Override
     public void start(Stage stage) {
@@ -32,7 +46,7 @@ public class TicTomate extends Application {
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
         grid.setHgap(1);
-        grid.setVgap(5);
+        grid.setVgap(6);
         root.setCenter(grid);
 
         GridPane textGrid = new GridPane();
@@ -106,17 +120,23 @@ public class TicTomate extends Application {
 
         restTimeGrid.add(sliderRestTime, 1, 0);
 
+        timerLabel.setText("0:00");
+        timerLabel.setAlignment(Pos.CENTER);
+        grid.add(timerLabel, 0, 4);
 
         GridPane buttonsGrid = new GridPane();
         buttonsGrid.setHgap(2);
         buttonsGrid.setVgap(1);
         buttonsGrid.setAlignment(Pos.CENTER);
-        grid.add(buttonsGrid,0,4);
+        grid.add(buttonsGrid, 0, 5);
 
         Button startButton = new Button();
         startButton.setText("Start");
         startButton.setAlignment(Pos.CENTER_LEFT);
+        startButton.setOnAction(event -> this.startTimer(Double.valueOf(sliderTaskTime.getValue()).intValue(),
+                Double.valueOf(sliderRestTime.getValue()).intValue()));
         buttonsGrid.add(startButton, 0, 0);
+
 
         Button stopButton = new Button();
         stopButton.setText("Stop");
@@ -126,6 +146,46 @@ public class TicTomate extends Application {
         stage.getIcons().add(new Image(TicTomate.class.getResourceAsStream("/icon.png")));
         stage.setScene(scene);
         stage.show();
+    }
+
+    private void startTimer(int workingMinutes, int restingMinutes) {
+        this.workingSeconds = TimeUnit.MINUTES.toSeconds(workingMinutes);
+        this.restingSeconds = TimeUnit.MINUTES.toSeconds(restingMinutes);
+
+        final LongProperty lastUpdate = new SimpleLongProperty();
+
+        final long minUpdateInterval = TimeUnit.SECONDS.toNanos(1); // nanoseconds. Set to higher number to slow output.
+
+        AnimationTimer animationTimer = new AnimationTimer() {
+
+            @Override
+            public void handle(long now) {
+                if (now - lastUpdate.get() > minUpdateInterval) {
+                    updateCounter();
+                    lastUpdate.set(now);
+                }
+
+            }
+        };
+        animationTimer.start();
+    }
+
+    private void updateCounter(){
+        if (workingSeconds == 0){
+            timer.cancel();
+        }else {
+            this.workingSeconds--;
+            this.updateCurrentTimerLabel();
+        }
+    }
+
+    private void updateCurrentTimerLabel(){
+        long seconds = this.workingSeconds % 60;
+        long totalMinutes = this.workingSeconds / 60;
+        long minutes = totalMinutes % 60;
+        StringBuffer sb = new StringBuffer();
+        sb.append(minutes).append(":").append(seconds);
+        this.timerLabel.setText(sb.toString());
     }
 
 }
