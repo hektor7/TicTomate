@@ -1,6 +1,5 @@
 package com.hektor7.tictomate;
 
-import com.sun.xml.internal.ws.util.StringUtils;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.beans.property.LongProperty;
@@ -17,7 +16,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -49,17 +47,20 @@ public class TicTomate extends Application {
         grid.setVgap(6);
         root.setCenter(grid);
 
-        GridPane textGrid = new GridPane();
-        textGrid.setAlignment(Pos.CENTER);
-        textGrid.setHgap(1);
-        textGrid.setVgap(2);
-        grid.add(textGrid, 0, 1);
+        //STARTS TASK'S NAME
+        GridPane taskTextGrid = new GridPane();
+        taskTextGrid.setAlignment(Pos.CENTER);
+        taskTextGrid.setHgap(1);
+        taskTextGrid.setVgap(2);
+        grid.add(taskTextGrid, 0, 1);
 
         Label taskLabel = new Label("Task name: ");
-        textGrid.add(taskLabel, 0, 0);
+        taskTextGrid.add(taskLabel, 0, 0);
         TextField taskName = new TextField();
-        textGrid.add(taskName, 1, 0);
+        taskTextGrid.add(taskName, 1, 0);
+        //ENDS TASK'S NAME
 
+        //STARTS TASK'S TIME
         GridPane taskTimeGrid = new GridPane();
         taskTimeGrid.setVgap(2);
         taskTimeGrid.setHgap(1);
@@ -69,8 +70,6 @@ public class TicTomate extends Application {
         Label sliderTaskTimeLabel = new Label("Task time: ");
         taskTimeGrid.add(sliderTaskTimeLabel, 0, 0);
 
-        Label sliderTaskTimeValue = new Label();
-        taskTimeGrid.add(sliderTaskTimeValue, 2, 0);
 
         Slider sliderTaskTime = new Slider();
         sliderTaskTime.setMin(0);
@@ -82,14 +81,20 @@ public class TicTomate extends Application {
         sliderTaskTime.setBlockIncrement(1);
         sliderTaskTime.setValueChanging(true);
 
+        Label sliderTaskTimeValue = new Label();
+        sliderTaskTimeValue.setText(String.format("%.0f", sliderTaskTime.getValue()));
+        taskTimeGrid.add(sliderTaskTimeValue, 2, 0);
+
         sliderTaskTime.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                sliderTaskTimeValue.setText(String.format("%.2f", newValue));
+                sliderTaskTimeValue.setText(String.format("%.0f", newValue));
             }
         });
         taskTimeGrid.add(sliderTaskTime, 1, 0);
+        //ENDS TASK'S TIME
 
+        //STARTS REST'S TIME
         GridPane restTimeGrid = new GridPane();
         restTimeGrid.setVgap(3);
         restTimeGrid.setHgap(1);
@@ -98,9 +103,6 @@ public class TicTomate extends Application {
 
         Label sliderRestTimeLabel = new Label("Rest time: ");
         restTimeGrid.add(sliderRestTimeLabel, 0, 0);
-
-        Label sliderRestTimeValue = new Label();
-        restTimeGrid.add(sliderRestTimeValue, 2, 0);
 
         Slider sliderRestTime = new Slider();
         sliderRestTime.setMin(0);
@@ -111,19 +113,27 @@ public class TicTomate extends Application {
         sliderRestTime.setMinorTickCount(5);
         sliderRestTime.setBlockIncrement(1);
 
+        Label sliderRestTimeValue = new Label();
+        sliderRestTimeValue.setText(String.format("%.0f",sliderRestTime.getValue()));
+        restTimeGrid.add(sliderRestTimeValue, 2, 0);
+
         sliderRestTime.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                sliderRestTimeValue.setText(String.format("%.2f", newValue));
+                sliderRestTimeValue.setText(String.format("%.0f", newValue));
             }
         });
 
         restTimeGrid.add(sliderRestTime, 1, 0);
+        //ENDS REST'S TIME
 
+        //STARTS TIMER
         timerLabel.setText("0:00");
         timerLabel.setAlignment(Pos.CENTER);
         grid.add(timerLabel, 0, 4);
+        //ENDS TIMER
 
+        //STARTS BUTTONS
         GridPane buttonsGrid = new GridPane();
         buttonsGrid.setHgap(2);
         buttonsGrid.setVgap(1);
@@ -142,6 +152,7 @@ public class TicTomate extends Application {
         stopButton.setText("Stop");
         stopButton.setAlignment(Pos.CENTER_RIGHT);
         buttonsGrid.add(stopButton,1,0);
+        //ENDS BUTTONS
 
         stage.getIcons().add(new Image(TicTomate.class.getResourceAsStream("/icon.png")));
         stage.setScene(scene);
@@ -151,6 +162,7 @@ public class TicTomate extends Application {
     private void startTimer(int workingMinutes, int restingMinutes) {
         this.workingSeconds = TimeUnit.MINUTES.toSeconds(workingMinutes);
         this.restingSeconds = TimeUnit.MINUTES.toSeconds(restingMinutes);
+        //TODO: Disable UI controls
 
         final LongProperty lastUpdate = new SimpleLongProperty();
 
@@ -173,6 +185,7 @@ public class TicTomate extends Application {
     private void updateCounter(){
         if (workingSeconds == 0){
             timer.cancel();
+            //TODO: Enable UI controls
         }else {
             this.workingSeconds--;
             this.updateCurrentTimerLabel();
