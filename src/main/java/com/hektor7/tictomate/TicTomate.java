@@ -43,7 +43,6 @@ public class TicTomate extends Application {
     private void startTimer(int workingMinutes, int restingMinutes) {
         this.workingSeconds = TimeUnit.MINUTES.toSeconds(workingMinutes);
         this.restingSeconds = TimeUnit.MINUTES.toSeconds(restingMinutes);
-        //TODO: Disable UI controls
 
         final LongProperty lastUpdate = new SimpleLongProperty();
 

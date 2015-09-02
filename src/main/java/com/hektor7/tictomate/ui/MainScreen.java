@@ -66,9 +66,13 @@ public class MainScreen {
     public void buildUi(Stage stage) {
 
         BorderPane root = new BorderPane();
-        Rectangle2D visualBounds = Screen.getPrimary().getVisualBounds();
-        this.scene = new Scene(root, visualBounds.getWidth(), visualBounds.getHeight());
-        stage.setTitle("TicTomate v0.1");
+
+
+        //Rectangle2D visualBounds = Screen.getPrimary().getVisualBounds();
+
+        //this.scene = new Scene(root, visualBounds.getWidth(), visualBounds.getHeight());
+
+        this.setupStage(stage);
 
         this.createMainGrid(root);
 
@@ -81,9 +85,16 @@ public class MainScreen {
         this.setupTimerLabel();
         this.createButtons();
 
+        this.scene = new Scene(root, root.getWidth(), root.getHeight());
+
         stage.getIcons().add(new Image(TicTomate.class.getResourceAsStream("/icon.png")));
         stage.setScene(this.scene);
 
+    }
+
+    private void setupStage(Stage stage) {
+        stage.setTitle("TicTomate v0.1");
+        stage.setResizable(false);
     }
 
     private void createMainGrid(BorderPane root) {
