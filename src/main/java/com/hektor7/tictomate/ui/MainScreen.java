@@ -63,14 +63,14 @@ public class MainScreen {
         return this.timerLabel;
     }
 
+    /**
+     * It initializes the User Interface.
+     *
+     * @param stage
+     */
     public void buildUi(Stage stage) {
 
         BorderPane root = new BorderPane();
-
-
-        //Rectangle2D visualBounds = Screen.getPrimary().getVisualBounds();
-
-        //this.scene = new Scene(root, visualBounds.getWidth(), visualBounds.getHeight());
 
         this.setupStage(stage);
 
@@ -142,7 +142,7 @@ public class MainScreen {
         this.grid.add(restTimeGrid, 0, 3);
 
         this.sliderRestTime = new Slider();
-        this.sliderRestTime.setMin(0);
+        this.sliderRestTime.setMin(1);
         this.sliderRestTime.setMax(25);
         this.sliderRestTime.setValue(5);
         this.sliderRestTime.setShowTickMarks(true);
@@ -174,7 +174,7 @@ public class MainScreen {
         this.grid.add(taskTimeGrid, 0, 2);
 
         this.sliderTaskTime = new Slider();
-        this.sliderTaskTime.setMin(0);
+        this.sliderTaskTime.setMin(1);
         this.sliderTaskTime.setMax(90);
         this.sliderTaskTime.setValue(25);
         this.sliderTaskTime.setShowTickMarks(true);
@@ -223,6 +223,9 @@ public class MainScreen {
         this.grid.add(headerGrid, 0, 0);
     }
 
+    /**
+     * It enables components when user presses Stop.
+     */
     public void enableComponentsToStop() {
         this.getTaskName().setDisable(false);
         this.getSliderTaskTime().setDisable(false);
@@ -230,6 +233,9 @@ public class MainScreen {
         this.getStartButton().setDisable(false);
     }
 
+    /**
+     * It disables components when user presses Start.
+     */
     public void disableComponentsToStart() {
         this.getTaskName().setDisable(true);
         this.getSliderTaskTime().setDisable(true);
@@ -237,12 +243,15 @@ public class MainScreen {
         this.getStartButton().setDisable(true);
     }
 
+    /**
+     * It plays a bell.
+     */
     public void playBell() {
         URI uri = null;
         try {
             uri = this.getClass().getResource("/bell.wav").toURI();
         } catch (URISyntaxException e) {
-            this.showError("Ooops, I can't play the bell's sound!");
+            this.showError("Ooops, I can't play the bell's sound!"); //FIXME: Bad practice?
         }
         AudioClip audioClip = new AudioClip(uri.toString());
         audioClip.play();
@@ -253,6 +262,19 @@ public class MainScreen {
         alert.setTitle("Unexpected error");
         alert.setHeaderText("Error");
         alert.setContentText(message);
+
+        alert.showAndWait();
+
+    }
+
+    public void showFinishedDialog() { //TODO: Check TicTomate.java usage.
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Time is up!");
+        alert.setHeaderText("Information");
+        StringBuilder sb = new StringBuilder();
+        sb.append("This task should be finished: ")
+                .append(this.getTaskName().getText());
+        alert.setContentText(sb.toString());
 
         alert.showAndWait();
     }
