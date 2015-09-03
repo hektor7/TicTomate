@@ -37,6 +37,7 @@ public class MainScreen {
     private TextField taskName;
     private Label taskLabel;
     private Label headerLabel;
+    private ProgressIndicator progressIndicator;
     //UI Components <--
 
     public Button getStartButton() {
@@ -63,6 +64,10 @@ public class MainScreen {
         return this.timerLabel;
     }
 
+    public ProgressIndicator getProgressIndicator() {
+        return progressIndicator;
+    }
+
     /**
      * It initializes the User Interface.
      *
@@ -83,13 +88,20 @@ public class MainScreen {
         this.createRestingTimeSlider();
 
         this.setupTimerLabel();
+
+        this.createProgressIndicator();
         this.createButtons();
 
-        this.scene = new Scene(root, root.getWidth(), root.getHeight());
+        this.scene = new Scene(root, root.getMaxWidth(), root.getMaxHeight());
 
         stage.getIcons().add(new Image(TicTomate.class.getResourceAsStream("/icon.png")));
         stage.setScene(this.scene);
 
+    }
+
+    private void createProgressIndicator() {
+        this.progressIndicator = new ProgressIndicator(0.0);
+        this.grid.add(this.progressIndicator, 0, 5);
     }
 
     private void setupStage(Stage stage) {
@@ -101,7 +113,7 @@ public class MainScreen {
         this.grid = new GridPane();
         this.grid.setAlignment(Pos.CENTER);
         this.grid.setHgap(1);
-        this.grid.setVgap(6);
+        this.grid.setVgap(7);
         root.setCenter(this.grid);
     }
 
@@ -111,6 +123,7 @@ public class MainScreen {
         this.startButton = new Button();
         this.startButton.setText("Start");
         this.startButton.setAlignment(Pos.CENTER_LEFT);
+        this.startButton.setDefaultButton(true);
         buttonsGrid.add(this.startButton, 0, 0);
 
         this.stopButton = new Button();
@@ -124,14 +137,20 @@ public class MainScreen {
         buttonsGrid.setHgap(2);
         buttonsGrid.setVgap(1);
         buttonsGrid.setAlignment(Pos.CENTER);
-        this.grid.add(buttonsGrid, 0, 5);
+        this.grid.add(buttonsGrid, 0, 6);
         return buttonsGrid;
     }
 
     private void setupTimerLabel() {
-        this.timerLabel.setText("0:00");
+
+        GridPane timerLabelGrid = new GridPane();
+        timerLabelGrid.setAlignment(Pos.CENTER);
+        timerLabelGrid.setHgap(1);
+        timerLabelGrid.setVgap(1);
+        this.timerLabel = new Label("0:00");
         this.timerLabel.setAlignment(Pos.CENTER);
-        this.grid.add(this.timerLabel, 0, 4);
+        timerLabelGrid.add(this.timerLabel, 0, 0);
+        this.grid.add(timerLabelGrid, 0, 4);
     }
 
     private void createRestingTimeSlider() {
@@ -231,6 +250,9 @@ public class MainScreen {
         this.getSliderTaskTime().setDisable(false);
         this.getSliderRestTime().setDisable(false);
         this.getStartButton().setDisable(false);
+        this.getStopButton().setDefaultButton(false);
+        this.getStartButton().setDefaultButton(true);
+
     }
 
     /**
@@ -241,6 +263,8 @@ public class MainScreen {
         this.getSliderTaskTime().setDisable(true);
         this.getSliderRestTime().setDisable(true);
         this.getStartButton().setDisable(true);
+        this.getStopButton().setDefaultButton(true);
+        this.getStartButton().setDefaultButton(false);
     }
 
     /**
@@ -265,17 +289,5 @@ public class MainScreen {
 
         alert.showAndWait();
 
-    }
-
-    public void showFinishedDialog() { //TODO: Check TicTomate.java usage.
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Time is up!");
-        alert.setHeaderText("Information");
-        StringBuilder sb = new StringBuilder();
-        sb.append("This task should be finished: ")
-                .append(this.getTaskName().getText());
-        alert.setContentText(sb.toString());
-
-        alert.showAndWait();
     }
 }

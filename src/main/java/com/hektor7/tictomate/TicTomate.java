@@ -10,10 +10,9 @@ import javafx.stage.Stage;
 
 import java.util.concurrent.TimeUnit;
 
-//TODO: Include a progress indicator
 //TODO: Use CSS to customize the UI
 //TODO: Include number of "pomodoros"
-//TODO: Include time indicator to big rest
+//TODO: Include time indicator for big rest
 public class TicTomate extends Application {
 
     long workingSeconds = 0;
@@ -90,8 +89,6 @@ public class TicTomate extends Application {
             this.animationTimer.stop();
             this.mainScreen.enableComponentsToStop();
             this.mainScreen.playBell();
-            //this.mainScreen.showFinishedDialog(); //TODO: Check for do it in another way
-
         }else{
             this.updateCounter();
         }
@@ -105,39 +102,54 @@ public class TicTomate extends Application {
         if (this.mode.equals(TimerMode.WORKING)){
             if (this.workingSeconds > 0){
                 this.workingSeconds--;
-                this.updateCurrentTimerLabel();
             }else{
                 this.mode = TimerMode.RESTING;
             }
         }else if (this.mode.equals(TimerMode.RESTING)){
             if (this.restingSeconds > 0){
                 this.restingSeconds--;
-                this.updateCurrentTimerLabel();
             }
         }
-
         if (this.mode.equals(TimerMode.RESTING) && this.restingSeconds == 0){
             this.mode = TimerMode.FINISHED;
         }
+        this.updateCurrentTimerIndicators();
     }
 
     /**
      * It updates timer label in order to show the current countdown value.
      */
-    private void updateCurrentTimerLabel(){
-        long seconds = this.getSeconds() % 60;
-        long totalMinutes = this.getSeconds() / 60;
+    private void updateCurrentTimerIndicators(){
+        long seconds = this.getCurrentSeconds() % 60;
+        long totalMinutes = this.getCurrentSeconds() / 60;
         long minutes = totalMinutes % 60;
         StringBuilder sb = new StringBuilder();
         sb.append(minutes).append(":").append(seconds);
         this.mainScreen.getTimerLabel().setText(sb.toString());
+        this.mainScreen.getProgressIndicator().setProgress(this.getProgress());
+    }
+
+    private double getProgress() {
+        double current = this.getCurrentSeconds();
+        double total = this.getTotalSeconds();
+        return (double) current/ total;
+    }
+
+    private long getTotalSeconds() {
+        long seconds = 0;
+        if (this.mode.equals(TimerMode.WORKING)){
+            seconds = TimeUnit.MINUTES.toSeconds((long) this.mainScreen.getSliderTaskTime().getValue());
+        }else if (this.mode.equals(TimerMode.RESTING)){
+            seconds = TimeUnit.MINUTES.toSeconds((long) this.mainScreen.getSliderRestTime().getValue());
+        }
+        return seconds;
     }
 
     /**
      * It gets seconds for Working or Resting time bearing in mind the current mode.
      * @return current seconds
      */
-    private long getSeconds() {
+    private long getCurrentSeconds() {
         long seconds = 0;
         if (this.mode.equals(TimerMode.WORKING)){
             seconds = this.workingSeconds;
