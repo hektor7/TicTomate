@@ -10,9 +10,6 @@ import javafx.stage.Stage;
 
 import java.util.concurrent.TimeUnit;
 
-//TODO: Use CSS to customize the UI
-//TODO: Include number of "pomodoros"
-//TODO: Include time indicator for big rest
 public class TicTomate extends Application {
 
     long workingSeconds = 0;
