@@ -14,15 +14,13 @@ public class TicTomate extends Application {
 
     long workingSeconds = 0;
     long restingSeconds = 0;
-    TimerMode mode;
+    TimerMode mode = TimerMode.STAND_BY;
 
     MainScreen mainScreen;
     private AnimationTimer animationTimer;
 
     @Override
     public void start(Stage stage) {
-
-        this.mode = TimerMode.STAND_BY;
 
         this.mainScreen = new MainScreen();
         this.mainScreen.buildUi(stage);
@@ -55,7 +53,7 @@ public class TicTomate extends Application {
      * @param restingMinutes resting minutes
      */
     private void startTimer(int workingMinutes, int restingMinutes) {
-        this.mode = TimerMode.WORKING;
+        this.changeModeTo(TimerMode.WORKING);
         this.workingSeconds = TimeUnit.MINUTES.toSeconds(workingMinutes);
         this.restingSeconds = TimeUnit.MINUTES.toSeconds(restingMinutes);
 
@@ -85,7 +83,6 @@ public class TicTomate extends Application {
         if (this.mode.equals(TimerMode.FINISHED)){
             this.animationTimer.stop();
             this.mainScreen.enableComponentsToStop();
-            this.mainScreen.playBell();
         }else{
             this.updateCounter();
         }
@@ -100,7 +97,7 @@ public class TicTomate extends Application {
             if (this.workingSeconds > 0){
                 this.workingSeconds--;
             }else{
-                this.mode = TimerMode.RESTING;
+                this.changeModeTo(TimerMode.RESTING);
             }
         }else if (this.mode.equals(TimerMode.RESTING)){
             if (this.restingSeconds > 0){
@@ -108,9 +105,16 @@ public class TicTomate extends Application {
             }
         }
         if (this.mode.equals(TimerMode.RESTING) && this.restingSeconds == 0){
-            this.mode = TimerMode.FINISHED;
+            this.changeModeTo(TimerMode.FINISHED);
         }
         this.updateCurrentTimerIndicators();
+    }
+
+    private void changeModeTo(TimerMode mode) {
+        if (!this.mode.equals(TimerMode.STAND_BY)){
+            this.mainScreen.playBell();
+        }
+        this.mode = mode;
     }
 
     /**
