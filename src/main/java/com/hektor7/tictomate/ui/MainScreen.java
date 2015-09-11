@@ -1,6 +1,7 @@
 package com.hektor7.tictomate.ui;
 
 import com.hektor7.tictomate.TicTomate;
+import com.hektor7.tictomate.enums.TimerMode;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -38,6 +39,8 @@ public class MainScreen {
     private Label taskLabel;
     private Label headerLabel;
     private ProgressIndicator progressIndicator;
+
+    private Label modeLabel;
     //UI Components <--
 
     public Button getStartButton() {
@@ -64,6 +67,10 @@ public class MainScreen {
         return this.timerLabel;
     }
 
+    public Label getModeLabel() {
+        return modeLabel;
+    }
+
     public ProgressIndicator getProgressIndicator() {
         return progressIndicator;
     }
@@ -87,6 +94,8 @@ public class MainScreen {
         this.createWorkingTimeSlider();
         this.createRestingTimeSlider();
 
+        this.createModeLabel();
+
         this.setupTimerLabel();
 
         this.createProgressIndicator();
@@ -101,7 +110,7 @@ public class MainScreen {
 
     private void createProgressIndicator() {
         this.progressIndicator = new ProgressIndicator(0.0);
-        this.grid.add(this.progressIndicator, 0, 5);
+        this.grid.add(this.progressIndicator, 0, 6);
     }
 
     private void setupStage(Stage stage) {
@@ -113,7 +122,7 @@ public class MainScreen {
         this.grid = new GridPane();
         this.grid.setAlignment(Pos.CENTER);
         this.grid.setHgap(1);
-        this.grid.setVgap(7);
+        this.grid.setVgap(8);
         root.setCenter(this.grid);
     }
 
@@ -137,8 +146,19 @@ public class MainScreen {
         buttonsGrid.setHgap(2);
         buttonsGrid.setVgap(1);
         buttonsGrid.setAlignment(Pos.CENTER);
-        this.grid.add(buttonsGrid, 0, 6);
+        this.grid.add(buttonsGrid, 0, 7);
         return buttonsGrid;
+    }
+
+    private void createModeLabel() {
+        GridPane modeLabelGrid = new GridPane();
+        modeLabelGrid.setAlignment(Pos.CENTER);
+        modeLabelGrid.setHgap(1);
+        modeLabelGrid.setVgap(1);
+        this.modeLabel = new Label(TimerMode.STAND_BY.getName());
+        this.modeLabel.setAlignment(Pos.CENTER);
+        modeLabelGrid.add(this.modeLabel, 0, 0);
+        this.grid.add(modeLabelGrid, 0, 4);
     }
 
     private void setupTimerLabel() {
@@ -150,7 +170,7 @@ public class MainScreen {
         this.timerLabel = new Label("0:00");
         this.timerLabel.setAlignment(Pos.CENTER);
         timerLabelGrid.add(this.timerLabel, 0, 0);
-        this.grid.add(timerLabelGrid, 0, 4);
+        this.grid.add(timerLabelGrid, 0, 5);
     }
 
     private void createRestingTimeSlider() {

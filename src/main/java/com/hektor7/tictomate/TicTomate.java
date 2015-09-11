@@ -111,10 +111,12 @@ public class TicTomate extends Application {
     }
 
     private void changeModeTo(TimerMode mode) {
-        if (!this.mode.equals(TimerMode.STAND_BY)){
+        if (mode.isExitFromThisModePlaysBell()){
             this.mainScreen.playBell();
         }
+
         this.mode = mode;
+        this.mainScreen.getModeLabel().setText(this.mode.getName());
     }
 
     /**
