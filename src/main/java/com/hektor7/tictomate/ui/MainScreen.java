@@ -89,6 +89,7 @@ public class MainScreen {
         this.createMainGrid(root);
 
         this.createHeader();
+
         this.createTaskTextField();
 
         this.createWorkingTimeSlider();
@@ -108,11 +109,6 @@ public class MainScreen {
 
     }
 
-    private void createProgressIndicator() {
-        this.progressIndicator = new ProgressIndicator(0.0);
-        this.grid.add(this.progressIndicator, 0, 6);
-    }
-
     private void setupStage(Stage stage) {
         stage.setTitle("TicTomate v0.1");
         stage.setResizable(false);
@@ -126,83 +122,29 @@ public class MainScreen {
         root.setCenter(this.grid);
     }
 
-    private void createButtons() {
-        GridPane buttonsGrid = this.createButtonsGrid();
-
-        this.startButton = new Button();
-        this.startButton.setText("Start");
-        this.startButton.setAlignment(Pos.CENTER_LEFT);
-        this.startButton.setDefaultButton(true);
-        buttonsGrid.add(this.startButton, 0, 0);
-
-        this.stopButton = new Button();
-        this.stopButton.setText("Stop");
-        this.stopButton.setAlignment(Pos.CENTER_RIGHT);
-        buttonsGrid.add(this.stopButton, 1, 0);
+    private void createHeader() {
+        GridPane headerGrid = new GridPane();
+        headerGrid.setAlignment(Pos.CENTER);
+        headerGrid.setHgap(1);
+        headerGrid.setVgap(1);
+        this.headerLabel = new Label("TicTomate");
+        this.headerLabel.setAlignment(Pos.CENTER);
+        headerGrid.add(this.headerLabel, 0, 0);
+        this.grid.add(headerGrid, 0, 0);
     }
 
-    private GridPane createButtonsGrid() {
-        GridPane buttonsGrid = new GridPane();
-        buttonsGrid.setHgap(2);
-        buttonsGrid.setVgap(1);
-        buttonsGrid.setAlignment(Pos.CENTER);
-        this.grid.add(buttonsGrid, 0, 7);
-        return buttonsGrid;
-    }
+    private void createTaskTextField() {
+        GridPane taskTextGrid = new GridPane();
+        taskTextGrid.setAlignment(Pos.CENTER);
+        taskTextGrid.setHgap(1);
+        taskTextGrid.setVgap(2);
+        this.grid.add(taskTextGrid, 0, 1);
 
-    private void createModeLabel() {
-        GridPane modeLabelGrid = new GridPane();
-        modeLabelGrid.setAlignment(Pos.CENTER);
-        modeLabelGrid.setHgap(1);
-        modeLabelGrid.setVgap(1);
-        this.modeLabel = new Label(TimerMode.STAND_BY.getName());
-        this.modeLabel.setAlignment(Pos.CENTER);
-        modeLabelGrid.add(this.modeLabel, 0, 0);
-        this.grid.add(modeLabelGrid, 0, 4);
-    }
-
-    private void setupTimerLabel() {
-
-        GridPane timerLabelGrid = new GridPane();
-        timerLabelGrid.setAlignment(Pos.CENTER);
-        timerLabelGrid.setHgap(1);
-        timerLabelGrid.setVgap(1);
-        this.timerLabel = new Label("0:00");
-        this.timerLabel.setAlignment(Pos.CENTER);
-        timerLabelGrid.add(this.timerLabel, 0, 0);
-        this.grid.add(timerLabelGrid, 0, 5);
-    }
-
-    private void createRestingTimeSlider() {
-        GridPane restTimeGrid = new GridPane();
-        restTimeGrid.setVgap(3);
-        restTimeGrid.setHgap(1);
-        restTimeGrid.setAlignment(Pos.CENTER);
-        this.grid.add(restTimeGrid, 0, 3);
-
-        this.sliderRestTime = new Slider();
-        this.sliderRestTime.setMin(1);
-        this.sliderRestTime.setMax(25);
-        this.sliderRestTime.setValue(5);
-        this.sliderRestTime.setShowTickMarks(true);
-        this.sliderRestTime.setMajorTickUnit(5);
-        this.sliderRestTime.setMinorTickCount(5);
-        this.sliderRestTime.setBlockIncrement(1);
-
-        this.sliderRestTimeLabel = new Label("Rest time: ");
-        this.sliderRestTimeLabel.setLabelFor(this.sliderRestTime);
-        restTimeGrid.add(this.sliderRestTimeLabel, 0, 0);
-
-        this.sliderRestTimeValue = new Label();
-        this.sliderRestTimeValue.setText(String.format("%.0f", this.sliderRestTime.getValue()));
-        this.sliderRestTimeValue.setLabelFor(this.sliderRestTime);
-        restTimeGrid.add(this.sliderRestTimeValue, 2, 0);
-
-        this.sliderRestTime.valueProperty().addListener((observable, oldValue, newValue) -> {
-            sliderRestTimeValue.setText(String.format("%.0f", newValue));
-        });
-
-        restTimeGrid.add(this.sliderRestTime, 1, 0);
+        this.taskName = new TextField();
+        taskTextGrid.add(this.taskName, 1, 0);
+        this.taskLabel = new Label("Task name: ");
+        this.taskLabel.setLabelFor(this.taskName);
+        taskTextGrid.add(this.taskLabel, 0, 0);
     }
 
     private void createWorkingTimeSlider() {
@@ -237,30 +179,95 @@ public class MainScreen {
         taskTimeGrid.add(this.sliderTaskTime, 1, 0);
     }
 
-    private void createTaskTextField() {
-        GridPane taskTextGrid = new GridPane();
-        taskTextGrid.setAlignment(Pos.CENTER);
-        taskTextGrid.setHgap(1);
-        taskTextGrid.setVgap(2);
-        this.grid.add(taskTextGrid, 0, 1);
+    private void createRestingTimeSlider() {
+        GridPane restTimeGrid = new GridPane();
+        restTimeGrid.setVgap(3);
+        restTimeGrid.setHgap(1);
+        restTimeGrid.setAlignment(Pos.CENTER);
+        this.grid.add(restTimeGrid, 0, 3);
 
-        this.taskName = new TextField();
-        taskTextGrid.add(this.taskName, 1, 0);
-        this.taskLabel = new Label("Task name: ");
-        this.taskLabel.setLabelFor(this.taskName);
-        taskTextGrid.add(this.taskLabel, 0, 0);
+        this.sliderRestTime = new Slider();
+        this.sliderRestTime.setMin(1);
+        this.sliderRestTime.setMax(25);
+        this.sliderRestTime.setValue(5);
+        this.sliderRestTime.setShowTickMarks(true);
+        this.sliderRestTime.setMajorTickUnit(5);
+        this.sliderRestTime.setMinorTickCount(5);
+        this.sliderRestTime.setBlockIncrement(1);
+
+        this.sliderRestTimeLabel = new Label("Rest time: ");
+        this.sliderRestTimeLabel.setLabelFor(this.sliderRestTime);
+        restTimeGrid.add(this.sliderRestTimeLabel, 0, 0);
+
+        this.sliderRestTimeValue = new Label();
+        this.sliderRestTimeValue.setText(String.format("%.0f", this.sliderRestTime.getValue()));
+        this.sliderRestTimeValue.setLabelFor(this.sliderRestTime);
+        restTimeGrid.add(this.sliderRestTimeValue, 2, 0);
+
+        this.sliderRestTime.valueProperty().addListener((observable, oldValue, newValue) -> {
+            sliderRestTimeValue.setText(String.format("%.0f", newValue));
+        });
+
+        restTimeGrid.add(this.sliderRestTime, 1, 0);
     }
 
-    private void createHeader() {
-        GridPane headerGrid = new GridPane();
-        headerGrid.setAlignment(Pos.CENTER);
-        headerGrid.setHgap(1);
-        headerGrid.setVgap(1);
-        this.headerLabel = new Label("TicTomate");
-        this.headerLabel.setAlignment(Pos.CENTER);
-        headerGrid.add(this.headerLabel, 0, 0);
-        this.grid.add(headerGrid, 0, 0);
+    private void createModeLabel() {
+        GridPane modeLabelGrid = new GridPane();
+        modeLabelGrid.setAlignment(Pos.CENTER);
+        modeLabelGrid.setHgap(1);
+        modeLabelGrid.setVgap(1);
+        this.modeLabel = new Label(TimerMode.STAND_BY.getName());
+        this.modeLabel.setAlignment(Pos.CENTER);
+        modeLabelGrid.add(this.modeLabel, 0, 0);
+        this.grid.add(modeLabelGrid, 0, 4);
     }
+
+    private void setupTimerLabel() {
+
+        GridPane timerLabelGrid = new GridPane();
+        timerLabelGrid.setAlignment(Pos.CENTER);
+        timerLabelGrid.setHgap(1);
+        timerLabelGrid.setVgap(1);
+        this.timerLabel = new Label("0:00");
+        this.timerLabel.setAlignment(Pos.CENTER);
+        timerLabelGrid.add(this.timerLabel, 0, 0);
+        this.grid.add(timerLabelGrid, 0, 5);
+    }
+
+    private void createProgressIndicator() {
+        this.progressIndicator = new ProgressIndicator(0.0);
+        this.grid.add(this.progressIndicator, 0, 6);
+    }
+
+    private void createButtons() {
+        GridPane buttonsGrid = this.createButtonsGrid();
+
+        this.startButton = new Button();
+        this.startButton.setText("Start");
+        this.startButton.setAlignment(Pos.CENTER_LEFT);
+        this.startButton.setDefaultButton(true);
+        buttonsGrid.add(this.startButton, 0, 0);
+
+        this.stopButton = new Button();
+        this.stopButton.setText("Stop");
+        this.stopButton.setAlignment(Pos.CENTER_RIGHT);
+        buttonsGrid.add(this.stopButton, 1, 0);
+    }
+
+    private GridPane createButtonsGrid() {
+        GridPane buttonsGrid = new GridPane();
+        buttonsGrid.setHgap(2);
+        buttonsGrid.setVgap(1);
+        buttonsGrid.setAlignment(Pos.CENTER);
+        this.grid.add(buttonsGrid, 0, 7);
+        return buttonsGrid;
+    }
+
+
+
+
+
+
 
     /**
      * It enables components when user presses Stop.
