@@ -3,14 +3,12 @@ package com.hektor7.tictomate.ui;
 import com.hektor7.tictomate.TicTomate;
 import com.hektor7.tictomate.enums.TimerMode;
 import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.media.AudioClip;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.net.URI;
@@ -24,15 +22,22 @@ public class MainScreen {
 
     //--> UI Components
     private Scene scene;
-    private GridPane grid;
+    private GridPane mainGrid;
 
     Label timerLabel = new Label();
     private Slider sliderTaskTime;
     private Slider sliderRestTime;
+    private Slider sliderBigRestTime;
+    private Slider sliderPomodoros;
     private Button startButton;
     private Button stopButton;
     private Label sliderRestTimeLabel;
     private Label sliderRestTimeValue;
+    private Label sliderPomodorosValue;
+    private Label sliderPomodorosLabel;
+    private Label sliderBigRestTimeLabel;
+    private Label sliderBigRestTimeValue;
+
     private Label sliderTaskTimeLabel;
     private Label sliderTaskTimeValue;
     private TextField taskName;
@@ -92,8 +97,11 @@ public class MainScreen {
 
         this.createTaskTextField();
 
-        this.createWorkingTimeSlider();
-        this.createRestingTimeSlider();
+        this.createWorkingTimeBlock();
+        this.createRestingTimeBlock();
+        this.createBigRestingTimeBlock();
+        this.createPomodorosBlock();
+
 
         this.createModeLabel();
 
@@ -115,11 +123,11 @@ public class MainScreen {
     }
 
     private void createMainGrid(BorderPane root) {
-        this.grid = new GridPane();
-        this.grid.setAlignment(Pos.CENTER);
-        this.grid.setHgap(1);
-        this.grid.setVgap(8);
-        root.setCenter(this.grid);
+        this.mainGrid = new GridPane();
+        this.mainGrid.setAlignment(Pos.CENTER);
+        this.mainGrid.setHgap(1);
+        this.mainGrid.setVgap(10);
+        root.setCenter(this.mainGrid);
     }
 
     private void createHeader() {
@@ -130,7 +138,7 @@ public class MainScreen {
         this.headerLabel = new Label("TicTomate");
         this.headerLabel.setAlignment(Pos.CENTER);
         headerGrid.add(this.headerLabel, 0, 0);
-        this.grid.add(headerGrid, 0, 0);
+        this.mainGrid.add(headerGrid, 0, 0);
     }
 
     private void createTaskTextField() {
@@ -138,7 +146,7 @@ public class MainScreen {
         taskTextGrid.setAlignment(Pos.CENTER);
         taskTextGrid.setHgap(1);
         taskTextGrid.setVgap(2);
-        this.grid.add(taskTextGrid, 0, 1);
+        this.mainGrid.add(taskTextGrid, 0, 1);
 
         this.taskName = new TextField();
         taskTextGrid.add(this.taskName, 1, 0);
@@ -147,68 +155,100 @@ public class MainScreen {
         taskTextGrid.add(this.taskLabel, 0, 0);
     }
 
-    private void createWorkingTimeSlider() {
-        GridPane taskTimeGrid = new GridPane();
+    private void createWorkingTimeBlock() {
+
+        GridPane grid = this.createGridForSlider();
+        this.mainGrid.add(grid, 0, 2);
+
+        this.sliderTaskTime = this.createSliderBySliderMaxAndCurrentVal(90, 25);
+
+        grid.add(this.createLabelForSlider(this.sliderTaskTime, this.sliderTaskTimeLabel, "Task time: "), 0, 0);
+
+        grid.add(this.createValueLabelForSlider(this.sliderTaskTime, this.sliderTaskTimeValue), 2, 0);
+
+        grid.add(this.sliderTaskTime, 1, 0);
+    }
+
+    private void createRestingTimeBlock() {
+        GridPane grid = this.createGridForSlider();
+        this.mainGrid.add(grid, 0, 3);
+
+        this.sliderRestTime = this.createSliderBySliderMaxAndCurrentVal(40, 5);
+
+        grid.add(this.createLabelForSlider(this.sliderRestTime, this.sliderRestTimeLabel, "Rest time: "), 0, 0);
+
+        grid.add(this.createValueLabelForSlider(this.sliderRestTime, this.sliderRestTimeValue), 2, 0);
+
+        grid.add(this.sliderRestTime, 1, 0);
+    }
+
+    private void createBigRestingTimeBlock() {
+        GridPane grid= this.createGridForSlider();
+        this.mainGrid.add(grid, 0, 4);
+
+        this.sliderBigRestTime = this.createSliderBySliderMaxAndCurrentVal(25, 15);
+
+        grid.add(this.createLabelForSlider(this.sliderBigRestTime, this.sliderBigRestTimeLabel, "Big rest time: "), 0, 0);
+
+        grid.add(this.createValueLabelForSlider(this.sliderBigRestTime, this.sliderBigRestTimeValue), 2, 0);
+
+        grid.add(this.sliderBigRestTime, 1, 0);
+    }
+
+    private void createPomodorosBlock() {
+
+        GridPane grid = this.createGridForSlider();
+        this.mainGrid.add(grid, 0, 5);
+
+        this.sliderPomodoros = this.createSliderBySliderMaxAndCurrentVal(20, 1);
+
+        grid.add(this.createLabelForSlider(this.sliderPomodoros, this.sliderPomodorosLabel, "Big rest time: "), 0, 0);
+
+        grid.add(this.createValueLabelForSlider(this.sliderPomodoros, this.sliderPomodorosValue), 2, 0);
+
+        grid.add(this.sliderPomodoros, 1, 0);
+    }
+
+    private Label createValueLabelForSlider(Slider slider, Label label) {
+        label = new Label();
+        label.setText(String.format("%.0f", slider.getValue()));
+        label.setLabelFor(slider);
+
+        final Label finalLabel = label;
+        slider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            finalLabel.setText(String.format("%.0f", newValue));
+        });
+
+        return finalLabel;
+
+    }
+
+    private Label createLabelForSlider(Slider slider, Label label, String text) {
+        label = new Label("Task time: ");
+        label.setLabelFor(slider);
+        return label;
+    }
+
+    private Slider createSliderBySliderMaxAndCurrentVal(int max, int current) {
+        Slider slider = new Slider();
+        slider.setMin(1);
+        slider.setMax(max);
+        slider.setValue(current);
+        slider.setShowTickMarks(true);
+        slider.setMajorTickUnit(5);
+        slider.setMinorTickCount(5);
+        slider.setBlockIncrement(1);
+        slider.setValueChanging(true);
+        return slider;
+    }
+
+    private GridPane createGridForSlider() {
+        GridPane taskTimeGrid;
+        taskTimeGrid = new GridPane();
         taskTimeGrid.setVgap(2);
         taskTimeGrid.setHgap(1);
         taskTimeGrid.setAlignment(Pos.CENTER);
-        this.grid.add(taskTimeGrid, 0, 2);
-
-        this.sliderTaskTime = new Slider();
-        this.sliderTaskTime.setMin(1);
-        this.sliderTaskTime.setMax(90);
-        this.sliderTaskTime.setValue(25);
-        this.sliderTaskTime.setShowTickMarks(true);
-        this.sliderTaskTime.setMajorTickUnit(5);
-        this.sliderTaskTime.setMinorTickCount(5);
-        this.sliderTaskTime.setBlockIncrement(1);
-        this.sliderTaskTime.setValueChanging(true);
-
-        this.sliderTaskTimeLabel = new Label("Task time: ");
-        this.sliderTaskTimeLabel.setLabelFor(this.sliderTaskTime);
-        taskTimeGrid.add(this.sliderTaskTimeLabel, 0, 0);
-
-        this.sliderTaskTimeValue = new Label();
-        this.sliderTaskTimeValue.setText(String.format("%.0f", this.sliderTaskTime.getValue()));
-        this.sliderTaskTimeValue.setLabelFor(this.sliderTaskTime);
-        taskTimeGrid.add(this.sliderTaskTimeValue, 2, 0);
-
-        this.sliderTaskTime.valueProperty().addListener((observable, oldValue, newValue) -> {
-            sliderTaskTimeValue.setText(String.format("%.0f", newValue));
-        });
-        taskTimeGrid.add(this.sliderTaskTime, 1, 0);
-    }
-
-    private void createRestingTimeSlider() {
-        GridPane restTimeGrid = new GridPane();
-        restTimeGrid.setVgap(3);
-        restTimeGrid.setHgap(1);
-        restTimeGrid.setAlignment(Pos.CENTER);
-        this.grid.add(restTimeGrid, 0, 3);
-
-        this.sliderRestTime = new Slider();
-        this.sliderRestTime.setMin(1);
-        this.sliderRestTime.setMax(25);
-        this.sliderRestTime.setValue(5);
-        this.sliderRestTime.setShowTickMarks(true);
-        this.sliderRestTime.setMajorTickUnit(5);
-        this.sliderRestTime.setMinorTickCount(5);
-        this.sliderRestTime.setBlockIncrement(1);
-
-        this.sliderRestTimeLabel = new Label("Rest time: ");
-        this.sliderRestTimeLabel.setLabelFor(this.sliderRestTime);
-        restTimeGrid.add(this.sliderRestTimeLabel, 0, 0);
-
-        this.sliderRestTimeValue = new Label();
-        this.sliderRestTimeValue.setText(String.format("%.0f", this.sliderRestTime.getValue()));
-        this.sliderRestTimeValue.setLabelFor(this.sliderRestTime);
-        restTimeGrid.add(this.sliderRestTimeValue, 2, 0);
-
-        this.sliderRestTime.valueProperty().addListener((observable, oldValue, newValue) -> {
-            sliderRestTimeValue.setText(String.format("%.0f", newValue));
-        });
-
-        restTimeGrid.add(this.sliderRestTime, 1, 0);
+        return taskTimeGrid;
     }
 
     private void createModeLabel() {
@@ -219,7 +259,7 @@ public class MainScreen {
         this.modeLabel = new Label(TimerMode.STAND_BY.getName());
         this.modeLabel.setAlignment(Pos.CENTER);
         modeLabelGrid.add(this.modeLabel, 0, 0);
-        this.grid.add(modeLabelGrid, 0, 4);
+        this.mainGrid.add(modeLabelGrid, 0, 6);
     }
 
     private void setupTimerLabel() {
@@ -231,12 +271,12 @@ public class MainScreen {
         this.timerLabel = new Label("0:00");
         this.timerLabel.setAlignment(Pos.CENTER);
         timerLabelGrid.add(this.timerLabel, 0, 0);
-        this.grid.add(timerLabelGrid, 0, 5);
+        this.mainGrid.add(timerLabelGrid, 0, 7);
     }
 
     private void createProgressIndicator() {
         this.progressIndicator = new ProgressIndicator(0.0);
-        this.grid.add(this.progressIndicator, 0, 6);
+        this.mainGrid.add(this.progressIndicator, 0, 8);
     }
 
     private void createButtons() {
@@ -259,15 +299,9 @@ public class MainScreen {
         buttonsGrid.setHgap(2);
         buttonsGrid.setVgap(1);
         buttonsGrid.setAlignment(Pos.CENTER);
-        this.grid.add(buttonsGrid, 0, 7);
+        this.mainGrid.add(buttonsGrid, 0, 9);
         return buttonsGrid;
     }
-
-
-
-
-
-
 
     /**
      * It enables components when user presses Stop.
@@ -276,6 +310,8 @@ public class MainScreen {
         this.getTaskName().setDisable(false);
         this.getSliderTaskTime().setDisable(false);
         this.getSliderRestTime().setDisable(false);
+        this.getSliderBigRestTime().setDisable(false);
+        this.getSliderPomodoros().setDisable(false);
         this.getStartButton().setDisable(false);
         this.getStopButton().setDefaultButton(false);
         this.getStartButton().setDefaultButton(true);
@@ -289,6 +325,8 @@ public class MainScreen {
         this.getTaskName().setDisable(true);
         this.getSliderTaskTime().setDisable(true);
         this.getSliderRestTime().setDisable(true);
+        this.getSliderBigRestTime().setDisable(true);
+        this.getSliderPomodoros().setDisable(true);
         this.getStartButton().setDisable(true);
         this.getStopButton().setDefaultButton(true);
         this.getStartButton().setDefaultButton(false);
@@ -316,5 +354,13 @@ public class MainScreen {
 
         alert.showAndWait();
 
+    }
+
+    public Slider getSliderBigRestTime() {
+        return sliderBigRestTime;
+    }
+
+    public Slider getSliderPomodoros() {
+        return sliderPomodoros;
     }
 }
