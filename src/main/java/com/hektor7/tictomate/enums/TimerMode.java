@@ -7,22 +7,22 @@ public enum TimerMode {
     STAND_BY("Stand by", false),
     WORKING("Working", true),
     RESTING("Resting", true),
-    FINISHED("Finished", false);
+    FINISHED("Finished", true);
+
+    String name = "";
+    boolean noisyChange = false;
+
+    public boolean entailsPlaySound() {
+        return noisyChange;
+    }
 
     public String getName() {
         return name;
     }
 
-    public boolean isExitFromThisModePlaysBell() {
-        return existFromThisModePlaysBell;
-    }
-
-    String name = "";
-    boolean existFromThisModePlaysBell = false;
-
-    TimerMode(String name, boolean exitFromThisModePlaysBell){
+    TimerMode(String name, boolean noisyChange){
         this.name = name;
-        this.existFromThisModePlaysBell = exitFromThisModePlaysBell;
+        this.noisyChange = noisyChange;
     }
 
 

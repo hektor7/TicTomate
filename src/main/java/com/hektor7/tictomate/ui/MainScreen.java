@@ -202,7 +202,7 @@ public class MainScreen {
 
         this.sliderPomodoros = this.createSliderBySliderMaxAndCurrentVal(20, 1);
 
-        grid.add(this.createLabelForSlider(this.sliderPomodoros, this.sliderPomodorosLabel, "Big rest time: "), 0, 0);
+        grid.add(this.createLabelForSlider(this.sliderPomodoros, this.sliderPomodorosLabel, "Pomodoros: "), 0, 0);
 
         grid.add(this.createValueLabelForSlider(this.sliderPomodoros, this.sliderPomodorosValue), 2, 0);
 
@@ -224,7 +224,7 @@ public class MainScreen {
     }
 
     private Label createLabelForSlider(Slider slider, Label label, String text) {
-        label = new Label("Task time: ");
+        label = new Label(text);
         label.setLabelFor(slider);
         return label;
     }
