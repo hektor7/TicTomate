@@ -2,8 +2,6 @@ package com.hektor7.tictomate.controllers;
 
 import com.hektor7.tictomate.enums.TimerMode;
 import com.hektor7.tictomate.models.State;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -14,7 +12,6 @@ import javafx.scene.control.Spinner;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.AudioClip;
-import javafx.util.Duration;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -82,48 +79,33 @@ public class MainController {
         List<State> states = this.createListOfStates();
 
         this.startTimerFor(states);
-
-        /*IntStream.rangeClosed(1, this.getValueFrom(this.spinnerPomodoros)).forEach(i -> {
-            Stream.of(TimerMode.WORKING, TimerMode.RESTING).sequential()
-                    .forEach(currentState -> {
-                        establishCurrentMode(currentState);
-                        playSoundIfNecessaryFor(currentState);
-                        startTimerFor(obtainRealState(currentState, i));
-                    });
-        });*/
-
-
-
     }
 
     private void startTimerFor(List<State> states) {
-        //this.timerSeconds = this.getTotalSecondsFor(state);
         List<State> stateList = new LinkedList<>(states);
         timer = new Timer();
 
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                Platform.runLater(new Runnable() {
-                    public void run() {
-                        if (stateList.isEmpty()) {
-                            timer.cancel();
-                        } else {
+                Platform.runLater(() -> {
+                    if (stateList.isEmpty()) {
+                        timer.cancel();
+                    } else {
 
-                            //First time
-                            if (timerSeconds <= 0 && stateList.size() == states.size()) {
-                                timerSeconds = stateList.get(0).getTotalSeconds();
-                            } else {
-                                timerSeconds--;
-                                establishCurrentMode(stateList.get(0).getMode());
-                                establishTimerProperties(stateList.get(0).getMode());
-                                if (timerSeconds <= 0) {
-                                    stateList.remove(0);
-                                }
+                        if (timerSeconds <= 0) {
+                            timerSeconds = stateList.get(0).getTotalSeconds();
+                        } else {
+                            timerSeconds--;
+                            establishCurrentMode(stateList.get(0).getMode());
+                            establishTimerProperties(stateList.get(0).getMode());
+                            if (timerSeconds <= 0) {
+                                playSoundIfNecessaryFor(stateList.get(0).getMode());
+                                stateList.remove(0);
                             }
                         }
-
                     }
+
                 });
             }
         }, 1000, 1000); //Every 1 second
@@ -132,30 +114,27 @@ public class MainController {
     private List<State> createListOfStates() {
         List<State> states = new LinkedList<>();
 
-        IntStream.rangeClosed(1,this.getValueFrom(this.spinnerPomodoros)).sequential().forEach(i -> {
+        IntStream.rangeClosed(1, this.spinnerPomodoros.getValue()).sequential().forEach(i -> {
             Stream.of(TimerMode.WORKING, TimerMode.RESTING).sequential().forEach(mode -> {
-                states.add(new State(this.obtainRealState(mode, i),this.getTotalSecondsFor(mode),states.size()+1));
+                states.add(new State(this.obtainRealState(mode, i), this.getTotalSecondsFor(mode), states.size() + 1));
             });
         });
+
+        states.add(new State(TimerMode.FINISHED, 1L, states.size() + 1));
 
         return states;
 
     }
 
-    private int getValueFrom(Spinner<Integer> spinner) {
-        Integer i = spinner.getValue();
-
-        return i;
-    }
-
     private TimerMode obtainRealState(TimerMode state, int i) {
-        return i%4==0 && state.equals(TimerMode.RESTING) ?
+        return i % 4 == 0 && state.equals(TimerMode.RESTING) ?
                 TimerMode.BIG_RESTING : state;
     }
 
     @FXML
     void doStop(ActionEvent event) {
-        //TODO: Stop timer
+        this.timer.cancel();
+        this.establishCurrentMode(TimerMode.PAUSED);
     }
 
     @FXML
@@ -176,13 +155,8 @@ public class MainController {
     }
 
     private void initializeControls() {
-        this.setEnableButtons(true);
+        this.configureButtonsFor(TimerMode.STAND_BY);
         this.setEnableSpinners(true);
-    }
-
-    private void setEnableButtons(boolean isEnable) {
-        this.btnStart.setDisable(!isEnable);
-        this.btnStop.setDisable(!isEnable);
     }
 
     private void setEnableSpinners(boolean isEnable) {
@@ -194,31 +168,19 @@ public class MainController {
 
     private void establishCurrentMode(TimerMode currentState) {
         this.labelState.setText(currentState.getName());
-        this.setEnableButtons(currentState.isEnabledControls());
+        this.configureButtonsFor(currentState);
         this.setEnableSpinners(currentState.isEnabledControls());
     }
 
-    /*private void startTimerFor(TimerMode state) {
-
-        this.timerSeconds = this.getTotalSecondsFor(state);
-
-        timer = new Timer();
-
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                Platform.runLater(new Runnable() {
-                    public void run() {
-                        timerSeconds--;
-                        establishTimerProperties(state);
-
-                        if (timerSeconds <= 0)
-                            timer.cancel();
-                    }
-                });
-            }
-        }, 1000, 1000); //Every 1 second
-    }*/
+    private void configureButtonsFor(TimerMode currentState) {
+        if (Arrays.asList(TimerMode.FINISHED, TimerMode.STAND_BY).contains(currentState)) {
+            this.btnStart.setDisable(false);
+            this.btnStop.setDisable(false);
+        } else {
+            this.btnStart.setDisable(true);
+            this.btnStop.setDisable(false);
+        }
+    }
 
     private void establishTimerProperties(TimerMode state) {
         this.progressIndicator.setProgress(this.getProgress(state));
@@ -227,11 +189,11 @@ public class MainController {
     private double getProgress(TimerMode state) {
         double current = this.timerSeconds;
         double total = this.getTotalSecondsFor(state);
-        return (double) current/ total;
+        return (double) current / total;
     }
 
     private Long getTotalSecondsFor(TimerMode state) {
-        switch (state){
+        switch (state) {
             case WORKING:
                 return TimeUnit.MINUTES.toSeconds(this.spinnerWorkingTime.getValue());
             case RESTING:

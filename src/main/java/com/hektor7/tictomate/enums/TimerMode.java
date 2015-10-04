@@ -8,7 +8,8 @@ public enum TimerMode {
     WORKING("Working", true, false),
     RESTING("Resting", true, false),
     BIG_RESTING("Big Resting", true, false),
-    FINISHED("Finished", true, true);
+    PAUSED("Paused", false, true),
+    FINISHED("Finished", false, true);
 
     String name = "";
     boolean entailsPlaySound = false;
