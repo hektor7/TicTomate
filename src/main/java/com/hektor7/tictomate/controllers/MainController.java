@@ -1,8 +1,10 @@
 package com.hektor7.tictomate.controllers;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
+import com.hektor7.tictomate.enums.TimerMode;
+import com.hektor7.tictomate.models.State;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -11,6 +13,16 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Spinner;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.AudioClip;
+import javafx.util.Duration;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * Created by hector on 27/09/15.
@@ -22,6 +34,7 @@ public class MainController {
     private static final int MIN_POMODOROS = 1;
     private static final int MAX_POMODOROS = 20;
     private static final int DEFAULT_POMODOROS = 1;
+
     @FXML
     private ResourceBundle resources;
 
@@ -58,14 +71,91 @@ public class MainController {
     @FXML
     private Button btnStop;
 
+    Timer timer;
+
+    long timerSeconds;
+
+
     @FXML
     void doStart(ActionEvent event) {
 
+        List<State> states = this.createListOfStates();
+
+        this.startTimerFor(states);
+
+        /*IntStream.rangeClosed(1, this.getValueFrom(this.spinnerPomodoros)).forEach(i -> {
+            Stream.of(TimerMode.WORKING, TimerMode.RESTING).sequential()
+                    .forEach(currentState -> {
+                        establishCurrentMode(currentState);
+                        playSoundIfNecessaryFor(currentState);
+                        startTimerFor(obtainRealState(currentState, i));
+                    });
+        });*/
+
+
+
+    }
+
+    private void startTimerFor(List<State> states) {
+        //this.timerSeconds = this.getTotalSecondsFor(state);
+        List<State> stateList = new LinkedList<>(states);
+        timer = new Timer();
+
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(new Runnable() {
+                    public void run() {
+                        if (stateList.isEmpty()) {
+                            timer.cancel();
+                        } else {
+
+                            //First time
+                            if (timerSeconds <= 0 && stateList.size() == states.size()) {
+                                timerSeconds = stateList.get(0).getTotalSeconds();
+                            } else {
+                                timerSeconds--;
+                                establishCurrentMode(stateList.get(0).getMode());
+                                establishTimerProperties(stateList.get(0).getMode());
+                                if (timerSeconds <= 0) {
+                                    stateList.remove(0);
+                                }
+                            }
+                        }
+
+                    }
+                });
+            }
+        }, 1000, 1000); //Every 1 second
+    }
+
+    private List<State> createListOfStates() {
+        List<State> states = new LinkedList<>();
+
+        IntStream.rangeClosed(1,this.getValueFrom(this.spinnerPomodoros)).sequential().forEach(i -> {
+            Stream.of(TimerMode.WORKING, TimerMode.RESTING).sequential().forEach(mode -> {
+                states.add(new State(this.obtainRealState(mode, i),this.getTotalSecondsFor(mode),states.size()+1));
+            });
+        });
+
+        return states;
+
+    }
+
+    private int getValueFrom(Spinner<Integer> spinner) {
+        Integer i = spinner.getValue();
+
+        return i;
+    }
+
+    private TimerMode obtainRealState(TimerMode state, int i) {
+        return i%4==0 && state.equals(TimerMode.RESTING) ?
+                TimerMode.BIG_RESTING : state;
     }
 
     @FXML
     void doStop(ActionEvent event) {
-
+        //TODO: Stop timer
     }
 
     @FXML
@@ -81,37 +171,91 @@ public class MainController {
         assert btnStart != null : "fx:id=\"btnStart\" was not injected: check your FXML file 'Main.fxml'.";
         assert btnStop != null : "fx:id=\"btnStop\" was not injected: check your FXML file 'Main.fxml'.";
 
-        this.initializeSpinners();
+        this.initializeControls();
 
     }
 
-    private void initializeSpinners() {
-        this.enableSpinners();
-        this.enableButtons();
+    private void initializeControls() {
+        this.setEnableButtons(true);
+        this.setEnableSpinners(true);
     }
 
-    private void enableButtons() {
-        this.btnStart.setDisable(false);
-        this.btnStop.setDisable(false);
+    private void setEnableButtons(boolean isEnable) {
+        this.btnStart.setDisable(!isEnable);
+        this.btnStop.setDisable(!isEnable);
     }
 
-    private void disableButtons() {
-        this.btnStart.setDisable(true);
-        this.btnStop.setDisable(true);
+    private void setEnableSpinners(boolean isEnable) {
+        this.spinnerPomodoros.setEditable(isEnable);
+        this.spinnerBigRestTime.setEditable(isEnable);
+        this.spinnerRestingTime.setEditable(isEnable);
+        this.spinnerWorkingTime.setEditable(isEnable);
     }
 
-    private void enableSpinners() {
-        this.spinnerPomodoros.setEditable(true);
-        this.spinnerBigRestTime.setEditable(true);
-        this.spinnerRestingTime.setEditable(true);
-        this.spinnerWorkingTime.setEditable(true);
+    private void establishCurrentMode(TimerMode currentState) {
+        this.labelState.setText(currentState.getName());
+        this.setEnableButtons(currentState.isEnabledControls());
+        this.setEnableSpinners(currentState.isEnabledControls());
     }
 
-    private void disableSpinners() {
-        this.spinnerPomodoros.setEditable(false);
-        this.spinnerBigRestTime.setEditable(false);
-        this.spinnerRestingTime.setEditable(false);
-        this.spinnerWorkingTime.setEditable(false);
+    /*private void startTimerFor(TimerMode state) {
+
+        this.timerSeconds = this.getTotalSecondsFor(state);
+
+        timer = new Timer();
+
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(new Runnable() {
+                    public void run() {
+                        timerSeconds--;
+                        establishTimerProperties(state);
+
+                        if (timerSeconds <= 0)
+                            timer.cancel();
+                    }
+                });
+            }
+        }, 1000, 1000); //Every 1 second
+    }*/
+
+    private void establishTimerProperties(TimerMode state) {
+        this.progressIndicator.setProgress(this.getProgress(state));
+    }
+
+    private double getProgress(TimerMode state) {
+        double current = this.timerSeconds;
+        double total = this.getTotalSecondsFor(state);
+        return (double) current/ total;
+    }
+
+    private Long getTotalSecondsFor(TimerMode state) {
+        switch (state){
+            case WORKING:
+                return TimeUnit.MINUTES.toSeconds(this.spinnerWorkingTime.getValue());
+            case RESTING:
+                return TimeUnit.MINUTES.toSeconds(this.spinnerRestingTime.getValue());
+            default: //BIG REST
+                return TimeUnit.MINUTES.toSeconds(this.spinnerBigRestTime.getValue());
+        }
+    }
+
+    private void playSoundIfNecessaryFor(TimerMode currentState) {
+        if (currentState.isEntailsPlaySound()) {
+            this.playBell();
+        }
+    }
+
+    private void playBell() {
+        URI uri = null;
+        try {
+            uri = this.getClass().getResource("/bell.wav").toURI();
+        } catch (URISyntaxException e) {
+            //FIXME: Show error
+        }
+        AudioClip audioClip = new AudioClip(uri.toString());
+        audioClip.play();
     }
 }
 

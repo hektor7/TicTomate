@@ -22,7 +22,7 @@
                   <Insets bottom="10.0" top="10.0" />
                </VBox.margin>
             </Label>
-            <ProgressIndicator prefHeight="158.0" prefWidth="250.0" progress="0.0" />
+            <ProgressIndicator fx:id="progressIndicator" prefHeight="158.0" prefWidth="250.0" progress="0.0" />
             <Label fx:id="labelState" text="Stand by" textAlignment="CENTER">
                <font>
                   <Font name="System Bold" size="22.0" />
@@ -45,13 +45,29 @@
                         <Insets />
                      </GridPane.margin>
                   </Label>
-                  <Spinner fx:id="spinnerPomodoros" initialValue="1" max="20" min="1" prefWidth="60.0" GridPane.columnIndex="1" />
+                  <Spinner fx:id="spinnerPomodoros" initialValue="1" prefWidth="60.0" GridPane.columnIndex="1">
+                      <valueFactory>
+                          <SpinnerValueFactory.IntegerSpinnerValueFactory min="1" max="20"/>
+                      </valueFactory>
+                  </Spinner>
                   <Label text="Working time" GridPane.rowIndex="1" />
-                  <Spinner fx:id="spinnerWorkingTime" initialValue="25" max="60" min="1" prefWidth="60.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Spinner fx:id="spinnerWorkingTime"  prefWidth="60.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                      <valueFactory>
+                          <SpinnerValueFactory.IntegerSpinnerValueFactory initialValue="25" min="1" max="60"/>
+                      </valueFactory>
+                  </Spinner>
                   <Label text="Resting time" GridPane.rowIndex="2" />
-                  <Spinner fx:id="spinnerRestingTime" initialValue="5" max="60" min="1" prefWidth="60.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <Spinner fx:id="spinnerRestingTime"  prefWidth="60.0" GridPane.columnIndex="1" GridPane.rowIndex="2" >
+                      <valueFactory>
+                          <SpinnerValueFactory.IntegerSpinnerValueFactory initialValue="5" min="1" max="60"/>
+                      </valueFactory>
+                  </Spinner>
                   <Label text="Big rest time" GridPane.rowIndex="3" />
-                  <Spinner fx:id="spinnerBigRestTime" initialValue="15" max="120" min="1" prefWidth="60.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <Spinner fx:id="spinnerBigRestTime"  prefWidth="60.0" GridPane.columnIndex="1" GridPane.rowIndex="3" >
+                      <valueFactory>
+                          <SpinnerValueFactory.IntegerSpinnerValueFactory initialValue="15" min="1" max="120"/>
+                      </valueFactory>
+                  </Spinner>
                </children>
                <padding>
                   <Insets left="10.0" right="10.0" />
