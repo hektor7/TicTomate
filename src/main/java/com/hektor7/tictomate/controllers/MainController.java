@@ -207,7 +207,7 @@ public class MainController {
     }
 
     private void configureButtonsFor(TimerMode currentState) {
-        if (Arrays.asList(TimerMode.FINISHED, TimerMode.STAND_BY).contains(currentState)) {
+        if (Arrays.asList(TimerMode.FINISHED, TimerMode.STAND_BY, TimerMode.PAUSED).contains(currentState)) {
             this.btnStart.setDisable(false);
             this.btnStop.setDefaultButton(false);
             this.btnStart.setDefaultButton(true);
