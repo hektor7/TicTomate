@@ -1,4 +1,4 @@
 # TicTomate
-My own JavaFx app for Pomodoro's working technique.
+My own JavaFx 8 app for Pomodoro's working technique.
 
-Check development branch... nowadays there is nothing serious here...
+Stupid app but it's only a way to discover JavaFx 8 :)
