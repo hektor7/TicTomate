@@ -1,6 +1,8 @@
 buildscript {
     repositories {
         jcenter()
+        //central maven repo
+        mavenCentral()
     }
     dependencies {
         classpath 'org.javafxports:jfxmobile-plugin:1.0.0-b10'
@@ -18,5 +20,7 @@ mainClassName = 'com.hektor7.tictomate.TicTomate'
 jfxmobile {
     android {
         manifest = 'src/android/AndroidManifest.xml'
+        resDirectory = 'src/android/res'
+        androidSdk ='/home/hector/Desarrollo/IDEs_y_Herramientas/SDKs/android-sdk/'
     }
 }

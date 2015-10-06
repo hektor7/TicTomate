@@ -1,25 +1,49 @@
 package com.hektor7.tictomate;
 
+import com.hektor7.tictomate.ui.FXMLPage;
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+
 public class TicTomate extends Application {
 
+
     @Override
-    public void start(Stage stage) {
-        StackPane root = new StackPane(new Label("Hello JavaFX World!"));
+    public void start(Stage stage) throws IOException {
 
-        Rectangle2D visualBounds = Screen.getPrimary().getVisualBounds();
-        Scene scene = new Scene(root, visualBounds.getWidth(), visualBounds.getHeight());
+        this.arrangeView(stage);
 
-        stage.getIcons().add(new Image(TicTomate.class.getResourceAsStream("/icon.png")));
+    }
+
+    private void arrangeView(Stage stage) throws IOException {
+        Parent root = FXMLLoader.load(FXMLPage.MAIN.getPageUrl());
+
+
+        Scene scene = this.isDesktop() ? new Scene(root) : createSceneForMobile(root);
+
         stage.setScene(scene);
+        stage.setTitle("TicTomate v0.1");
+        stage.setResizable(false);
         stage.show();
     }
+
+    private boolean isDesktop() {
+        return "desktop".equals(System.getProperty("javafx.platform", "desktop"));
+    }
+
+    private Scene createSceneForMobile(Parent root) {
+        Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
+        return new Scene(root, bounds.getWidth(), bounds.getHeight());
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+
 }
