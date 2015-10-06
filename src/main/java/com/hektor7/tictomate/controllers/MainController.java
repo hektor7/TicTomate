@@ -25,10 +25,6 @@ import java.util.stream.Stream;
 
 public class MainController {
 
-    private static final int MIN_POMODOROS = 1;
-    private static final int MAX_POMODOROS = 20;
-    private static final int DEFAULT_POMODOROS = 1;
-
     @FXML
     private ResourceBundle resources;
 
@@ -97,7 +93,7 @@ public class MainController {
                             establishCurrentMode(stateList.get(0).getMode());
                             establishTimerProperties(stateList.get(0).getMode());
                             if (timerSeconds <= 0) {
-                                playSoundIfNecessaryFor(stateList.get(0).getMode());
+                                warnIfNecessaryFor(stateList.get(0).getMode());
                                 stateList.remove(0);
                             }
                         }
@@ -152,8 +148,8 @@ public class MainController {
     }
 
     private void initializeControls() {
-        this.configureButtonsFor(TimerMode.STAND_BY);
         this.initializeSpinners();
+        this.configureButtonsFor(TimerMode.STAND_BY);
     }
 
     private void initializeSpinners() {
@@ -172,7 +168,7 @@ public class MainController {
         this.configureFormatterForSpinner(spinner, minValue, maxValue, initialValue, step);
     }
 
-    private void establishUpDownAction(Spinner<Integer> spinner){
+    private void establishUpDownAction(Spinner<Integer> spinner) {
         spinner.getEditor().setOnKeyPressed(event -> {
             switch (event.getCode()) {
                 case UP:
@@ -213,9 +209,13 @@ public class MainController {
     private void configureButtonsFor(TimerMode currentState) {
         if (Arrays.asList(TimerMode.FINISHED, TimerMode.STAND_BY).contains(currentState)) {
             this.btnStart.setDisable(false);
-            this.btnStop.setDisable(false);
+            this.btnStop.setDefaultButton(false);
+            this.btnStart.setDefaultButton(true);
+            this.btnStop.setDisable(true);
         } else {
             this.btnStart.setDisable(true);
+            this.btnStart.setDefaultButton(false);
+            this.btnStop.setDefaultButton(true);
             this.btnStop.setDisable(false);
         }
     }
@@ -241,9 +241,10 @@ public class MainController {
         }
     }
 
-    private void playSoundIfNecessaryFor(TimerMode currentState) {
-        if (currentState.isEntailsPlaySound()) {
+    private void warnIfNecessaryFor(TimerMode currentState) {
+        if (currentState.isEntailsWarn()) {
             this.playBell();
+            //TODO: Bring window to front
         }
     }
 

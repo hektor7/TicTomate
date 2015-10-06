@@ -12,14 +12,14 @@ public enum TimerMode {
     FINISHED("Finished", false, true);
 
     String name = "";
-    boolean entailsPlaySound = false;
+    boolean entailsWarn = false;
     boolean enabledControls = true;
 
-    public boolean isEntailsPlaySound() {
-        return entailsPlaySound;
+    public boolean isEntailsWarn() {
+        return entailsWarn;
     }
 
-    public boolean isEnabledControls(){
+    public boolean isEnabledControls() {
         return enabledControls;
     }
 
@@ -27,9 +27,9 @@ public enum TimerMode {
         return name;
     }
 
-    TimerMode(String name, boolean entailsPlaySound, boolean enabledControls){
+    TimerMode(String name, boolean entailsWarn, boolean enabledControls) {
         this.name = name;
-        this.entailsPlaySound = entailsPlaySound;
+        this.entailsWarn = entailsWarn;
         this.enabledControls = enabledControls;
     }
 
