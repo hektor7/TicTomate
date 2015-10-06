@@ -5,10 +5,7 @@ import com.hektor7.tictomate.models.State;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.Spinner;
+import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.AudioClip;
@@ -156,7 +153,48 @@ public class MainController {
 
     private void initializeControls() {
         this.configureButtonsFor(TimerMode.STAND_BY);
+        this.initializeSpinners();
+    }
+
+    private void initializeSpinners() {
         this.setEnableSpinners(true);
+
+
+        this.configureSpinner(this.spinnerPomodoros, 1, 20, 1, 1);
+        this.configureSpinner(this.spinnerWorkingTime, 1, 120, 25, 1);
+        this.configureSpinner(this.spinnerRestingTime, 1, 60, 5, 1);
+        this.configureSpinner(this.spinnerBigRestTime, 1, 120, 15, 1);
+
+    }
+
+    private void configureSpinner(Spinner<Integer> spinner, int minValue, int maxValue, int initialValue, int step) {
+        this.establishUpDownAction(spinner);
+        this.configureFormatterForSpinner(spinner, minValue, maxValue, initialValue, step);
+    }
+
+    private void establishUpDownAction(Spinner<Integer> spinner){
+        spinner.getEditor().setOnKeyPressed(event -> {
+            switch (event.getCode()) {
+                case UP:
+                    spinner.increment(1);
+                    break;
+                case DOWN:
+                    spinner.decrement(1);
+                    break;
+            }
+        });
+    }
+
+    private void configureFormatterForSpinner(Spinner<Integer> spinner, int minValue, int maxValue, int initialValue, int step) {
+        // normal setup of spinner
+        SpinnerValueFactory factory = new SpinnerValueFactory.IntegerSpinnerValueFactory(minValue, maxValue, initialValue, step);
+        spinner.setValueFactory(factory);
+        spinner.setEditable(true);
+        // hook in a formatter with the same properties as the factory
+        TextFormatter formatter = new TextFormatter(factory.getConverter(), factory.getValue());
+        spinner.getEditor().setTextFormatter(formatter);
+        // bidirectional bind values
+        factory.valueProperty().bindBidirectional(formatter.valueProperty());
     }
 
     private void setEnableSpinners(boolean isEnable) {
