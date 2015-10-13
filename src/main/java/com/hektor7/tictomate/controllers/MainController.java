@@ -244,8 +244,22 @@ public class MainController {
     private void warnIfNecessaryFor(TimerMode currentState) {
         if (currentState.isEntailsWarn()) {
             this.playBell();
-            //TODO: Bring window to front
+            this.showFinishDialogFor(currentState);
+
         }
+    }
+
+    private void showFinishDialogFor(TimerMode finishedState) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Time is up!");
+        alert.setHeaderText(null);
+
+        StringBuilder sb = new StringBuilder();
+
+        alert.setContentText(sb.append(finishedState.getName())
+                .append(" time has finished!").toString());
+
+        alert.show();
     }
 
     private void playBell() {
