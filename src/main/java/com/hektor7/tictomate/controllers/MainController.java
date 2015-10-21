@@ -44,6 +44,9 @@ public class MainController {
     private Label labelState;
 
     @FXML
+    private Label labelCountDown;
+
+    @FXML
     private Spinner<Integer> spinnerPomodoros;
 
     @FXML
@@ -60,6 +63,9 @@ public class MainController {
 
     @FXML
     private Button btnStop;
+
+    @FXML
+    private Button btnReset;
 
     Timer timer;
 
@@ -92,6 +98,7 @@ public class MainController {
                             timerSeconds--;
                             establishCurrentMode(stateList.get(0).getMode());
                             establishTimerProperties(stateList.get(0).getMode());
+                            refreshCountdownLabel(stateList.get(0));
                             if (timerSeconds <= 0) {
                                 warnIfNecessaryFor(stateList.get(0).getMode());
                                 stateList.remove(0);
@@ -104,16 +111,33 @@ public class MainController {
         }, 1000, 1000); //Every 1 second
     }
 
+    //TODO: Refactor
+    private void refreshCountdownLabel(State state) {
+        final long minutes = TimeUnit.SECONDS.toMinutes(this.timerSeconds);
+        final long seconds = (this.timerSeconds) % 60;
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(String.format("%02d", minutes))
+                .append(":")
+                .append(String.format("%02d", seconds))
+                .append(" left. Pomodoro No. ")
+                .append(state.getNumberOfPomodoro())
+                .append(" of ").append(this.spinnerPomodoros.getValue());
+
+        this.labelCountDown.setText(sb.toString());
+    }
+
     private List<State> createListOfStates() {
         List<State> states = new LinkedList<>();
 
         IntStream.rangeClosed(1, this.spinnerPomodoros.getValue()).sequential().forEach(i -> {
             Stream.of(TimerMode.WORKING, TimerMode.RESTING).sequential().forEach(mode -> {
-                states.add(new State(this.obtainRealState(mode, i), this.getTotalSecondsFor(mode), states.size() + 1));
+                states.add(new State(this.obtainRealState(mode, i), this.getTotalSecondsFor(mode), states.size() + 1, i));
             });
         });
 
-        states.add(new State(TimerMode.FINISHED, 1L, states.size() + 1));
+        states.add(new State(TimerMode.FINISHED, 1L, states.size() + 1, 0));
 
         return states;
 
@@ -136,6 +160,7 @@ public class MainController {
         assert mainVBox != null : "fx:id=\"mainVBox\" was not injected: check your FXML file 'Main.fxml'.";
         assert progressIndicator != null : "fx:id=\"progressIndicator\" was not injected: check your FXML file 'Main.fxml'.";
         assert labelState != null : "fx:id=\"labelState\" was not injected: check your FXML file 'Main.fxml'.";
+        assert labelCountDown != null : "fx:id=\"labelCountDown\" was not injected: check your FXML file 'Main.fxml'.";
         assert spinnerPomodoros != null : "fx:id=\"spinnerPomodoros\" was not injected: check your FXML file 'Main.fxml'.";
         assert spinnerWorkingTime != null : "fx:id=\"spinnerWorkingTime\" was not injected: check your FXML file 'Main.fxml'.";
         assert spinnerRestingTime != null : "fx:id=\"spinnerRestingTime\" was not injected: check your FXML file 'Main.fxml'.";
@@ -155,12 +180,10 @@ public class MainController {
     private void initializeSpinners() {
         this.setEnableSpinners(true);
 
-
         this.configureSpinner(this.spinnerPomodoros, 1, 20, 1, 1);
         this.configureSpinner(this.spinnerWorkingTime, 1, 120, 25, 1);
         this.configureSpinner(this.spinnerRestingTime, 1, 60, 5, 1);
         this.configureSpinner(this.spinnerBigRestTime, 1, 120, 15, 1);
-
     }
 
     private void configureSpinner(Spinner<Integer> spinner, int minValue, int maxValue, int initialValue, int step) {
@@ -200,38 +223,40 @@ public class MainController {
         this.spinnerWorkingTime.setEditable(isEnable);
     }
 
-    private void establishCurrentMode(TimerMode currentState) {
-        this.labelState.setText(currentState.getName());
-        this.configureButtonsFor(currentState);
-        this.setEnableSpinners(currentState.isEnabledControls());
+    private void establishCurrentMode(TimerMode currentMode) {
+        this.labelState.setText(currentMode.getName());
+        this.configureButtonsFor(currentMode);
+        this.setEnableSpinners(currentMode.isEnabledControls());
     }
 
-    private void configureButtonsFor(TimerMode currentState) {
-        if (Arrays.asList(TimerMode.FINISHED, TimerMode.STAND_BY, TimerMode.PAUSED).contains(currentState)) {
+    private void configureButtonsFor(TimerMode currentMode) {
+        if (Arrays.asList(TimerMode.FINISHED, TimerMode.STAND_BY, TimerMode.PAUSED).contains(currentMode)) {
             this.btnStart.setDisable(false);
             this.btnStop.setDefaultButton(false);
             this.btnStart.setDefaultButton(true);
             this.btnStop.setDisable(true);
+            this.btnReset.setDisable(false);
         } else {
             this.btnStart.setDisable(true);
             this.btnStart.setDefaultButton(false);
             this.btnStop.setDefaultButton(true);
             this.btnStop.setDisable(false);
+            this.btnReset.setDisable(true);
         }
     }
 
-    private void establishTimerProperties(TimerMode state) {
-        this.progressIndicator.setProgress(this.getProgress(state));
+    private void establishTimerProperties(TimerMode mode) {
+        this.progressIndicator.setProgress(this.getProgress(mode));
     }
 
-    private double getProgress(TimerMode state) {
+    private double getProgress(TimerMode mode) {
         double current = this.timerSeconds;
-        double total = this.getTotalSecondsFor(state);
+        double total = this.getTotalSecondsFor(mode);
         return (double) current / total;
     }
 
-    private Long getTotalSecondsFor(TimerMode state) {
-        switch (state) {
+    private Long getTotalSecondsFor(TimerMode mode) {
+        switch (mode) {
             case WORKING:
                 return TimeUnit.MINUTES.toSeconds(this.spinnerWorkingTime.getValue());
             case RESTING:
@@ -241,22 +266,22 @@ public class MainController {
         }
     }
 
-    private void warnIfNecessaryFor(TimerMode currentState) {
-        if (currentState.isEntailsWarn()) {
+    private void warnIfNecessaryFor(TimerMode currentMode) {
+        if (currentMode.isEntailsWarn()) {
             this.playBell();
-            this.showFinishDialogFor(currentState);
+            this.showFinishDialogFor(currentMode);
 
         }
     }
 
-    private void showFinishDialogFor(TimerMode finishedState) {
+    private void showFinishDialogFor(TimerMode finishedMode) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Time is up!");
         alert.setHeaderText(null);
 
         StringBuilder sb = new StringBuilder();
 
-        alert.setContentText(sb.append(finishedState.getName())
+        alert.setContentText(sb.append(finishedMode.getName())
                 .append(" time has finished!").toString());
 
         alert.show();
@@ -271,6 +296,12 @@ public class MainController {
         }
         AudioClip audioClip = new AudioClip(uri.toString());
         audioClip.play();
+    }
+
+    public void doReset(ActionEvent actionEvent) {
+        this.timerSeconds = 0;
+        this.establishCurrentMode(TimerMode.STAND_BY);
+        this.labelCountDown.setText("");
     }
 }
 
