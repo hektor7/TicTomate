@@ -1,5 +1,6 @@
 package com.hektor7.tictomate.controllers;
 
+import com.hektor7.tictomate.PlatformFactory;
 import com.hektor7.tictomate.enums.TimerMode;
 import com.hektor7.tictomate.models.State;
 import javafx.application.Platform;
@@ -43,8 +44,6 @@ public class MainController {
     private final String LABEL_FOR_RESTING = "Resting time: {0}";
     private final String LABEL_FOR_BIG_REST = "Big rest time: {0}";
     private final String LABEL_FOR_COUNTDOWN = "{0}:{1} left. Pomodoro No. {2} of {3}";
-    private final String LABEL_FOR_TITLE_TIME_UP = "Time is up!";
-    private final String LABEL_FOR_MSG_TIME_UP = "{0} time has finished!";
 
     @FXML
     private ResourceBundle resources;
@@ -116,7 +115,6 @@ public class MainController {
 
     long timerSeconds;
 
-
     @FXML
     void doStart(ActionEvent event) {
 
@@ -177,7 +175,7 @@ public class MainController {
      * @return number of pomodoros.
      */
     private Integer getNumberOfPomodoros() {
-        return this.isDesktop() ? this.spinnerPomodoros.getValue()
+        return PlatformFactory.isDesktop() ? this.spinnerPomodoros.getValue()
                 : Double.valueOf(this.sliderPomodoros.getValue()).intValue();
     }
 
@@ -247,7 +245,7 @@ public class MainController {
     }
 
     private void initializeControls() {
-        if (this.isDesktop()){
+        if (PlatformFactory.isDesktop()){
             this.initializeControlsForDesktop();
         }else{
             this.initializeControlsForMobile();
@@ -413,54 +411,28 @@ public class MainController {
     }
 
     private Integer getBigRestTime() {
-        return this.isDesktop() ?
+        return PlatformFactory.isDesktop() ?
                 this.spinnerBigRestTime.getValue() :
                 Double.valueOf(this.sliderBigRestingTime.getValue()).intValue();
     }
 
     private Integer getRestingTime() {
-        return this.isDesktop() ?
+        return PlatformFactory.isDesktop() ?
                 this.spinnerRestingTime.getValue() :
                 Double.valueOf(this.sliderRestingTime.getValue()).intValue();
     }
 
     private Integer getWorkingTime() {
-        return this.isDesktop() ?
+        return PlatformFactory.isDesktop() ?
                 this.spinnerWorkingTime.getValue() :
                 Double.valueOf(this.sliderWorkingTime.getValue()).intValue();
     }
 
     private void warnIfNecessaryFor(TimerMode currentMode) {
         if (currentMode.isEntailsWarn()) {
-            if (this.isDesktop()) {
-                this.showFinishDialogFor(currentMode);
-            }
-            this.playBell();
+            PlatformFactory.getPlatform().warnForFinish(currentMode);
         }
-    }
 
-    //TODO: Move it to another class
-    private void showFinishDialogFor(TimerMode finishedMode) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(LABEL_FOR_TITLE_TIME_UP);
-        alert.setHeaderText(null);
-        alert.setContentText(MessageFormat.
-                format(LABEL_FOR_MSG_TIME_UP,
-                        finishedMode.getName()));
-        alert.show();
-    }
-
-    //TODO: Move this method to another class
-    private void playBell() {
-        URI uri = null;
-        try {
-            uri = this.getClass().getResource("/bell.mp3").toURI();
-            MediaPlayer audio = new MediaPlayer(
-                    new Media(uri.toString()));
-            audio.play();
-        } catch (URISyntaxException e) {
-            //FIXME: Show error
-        }
     }
 
     /**
@@ -472,11 +444,6 @@ public class MainController {
         this.timerSeconds = 0;
         this.establishCurrentMode(TimerMode.STAND_BY);
         this.labelCountDown.setText("");
-    }
-
-    //TODO: This method is duplicated (see TicTomate class), fix it.
-    private boolean isDesktop() {
-        return "desktop".equals(System.getProperty("javafx.platform", "desktop"));
     }
 }
 
