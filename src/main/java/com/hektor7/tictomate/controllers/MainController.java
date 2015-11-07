@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  * Created by hector on 27/09/15.
  */
 
-
+//TODO: Create a SoundService or AlertService and create an implementation for desktop and android
 public class MainController {
 
     private Integer MIN_POMODOROS = 1;
@@ -42,6 +42,9 @@ public class MainController {
     private String LABEL_FOR_WORKING = "Working time: {0}";
     private String LABEL_FOR_RESTING = "Resting time: {0}";
     private String LABEL_FOR_BIG_REST = "Big rest time: {0}";
+    private String LABEL_FOR_COUNTDOWN = "{0}:{1} left. Pomodoro No. {2} of {3}";
+    private String LABEL_FOR_TITLE_TIME_UP = "Time is up!";
+    private String LABEL_FOR_MSG_TIME_UP = "{0} time has finished!";
 
     @FXML
     private ResourceBundle resources;
@@ -122,6 +125,11 @@ public class MainController {
         this.startTimerFor(states);
     }
 
+    /**
+     * It starts the timer for a given sequence of states.
+     *
+     * @param states sequence of states
+     */
     private void startTimerFor(List<State> states) {
         List<State> stateList = new LinkedList<>(states);
         timer = new Timer();
@@ -153,21 +161,13 @@ public class MainController {
         }, 1000, 1000); //Every 1 second
     }
 
-    //TODO: Refactor
     private void refreshCountdownLabel(State state) {
         final long minutes = TimeUnit.SECONDS.toMinutes(this.timerSeconds);
         final long seconds = (this.timerSeconds) % 60;
 
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(String.format("%02d", minutes))
-                .append(":")
-                .append(String.format("%02d", seconds))
-                .append(" left. Pomodoro No. ")
-                .append(state.getNumberOfPomodoro())
-                .append(" of ").append(this.getNumberOfPomodoros());
-
-        this.labelCountDown.setText(sb.toString());
+        this.labelCountDown.setText(MessageFormat.format(LABEL_FOR_COUNTDOWN,
+                String.format("%02d", minutes), String.format("%02d", seconds),
+                state.getNumberOfPomodoro(), this.getNumberOfPomodoros()));
     }
 
     /**
@@ -197,9 +197,10 @@ public class MainController {
             });
         });*///Streams isn't available for Android because it uses SDK7.
 
-        for (int i=1;i<=this.getNumberOfPomodoros().intValue();i++){
+        for (int i=1;i<=this.getNumberOfPomodoros();i++){
             for (TimerMode mode:Arrays.asList(TimerMode.WORKING, TimerMode.RESTING)){
-                states.add(new State(this.obtainRealState(mode, i), this.getTotalSecondsFor(mode), states.size() + 1, i));
+                states.add(new State(this.obtainRealState(mode, i),
+                        this.getTotalSecondsFor(mode), states.size() + 1, i));
             }
         }
 
@@ -267,12 +268,21 @@ public class MainController {
         this.mainVBox.setPrefWidth(this.getScreenWidth());
         this.progressIndicator.setMaxWidth(this.getScreenWidth());
 
-        this.configureSlider(this.sliderPomodoros, MIN_POMODOROS, MAX_POMODOROS, DEFAULT_POMODOROS, LABEL_FOR_POMODOROS, labelPomodoros);
-        this.configureSlider(this.sliderWorkingTime, MIN_WORKING_TIME, MAX_WORKING_TIME, DEFAULT_WORKING_TIME, LABEL_FOR_WORKING, labelWorkingTime);
-        this.configureSlider(this.sliderRestingTime, MIN_RESTING_TIME, MAX_RESTING_TIME, DEFAULT_RESTING_TIME, LABEL_FOR_RESTING, labelRestingTime);
-        this.configureSlider(this.sliderBigRestingTime, MIN_BIG_RESTING_TIME, MAX_BIG_RESTING_TIME, DEFAULT_BIG_RESTING_TIME, LABEL_FOR_BIG_REST, labelBigRestingTime);
+        this.configureSlider(this.sliderPomodoros, MIN_POMODOROS,
+                MAX_POMODOROS, DEFAULT_POMODOROS, LABEL_FOR_POMODOROS,
+                labelPomodoros);
+        this.configureSlider(this.sliderWorkingTime, MIN_WORKING_TIME,
+                MAX_WORKING_TIME, DEFAULT_WORKING_TIME, LABEL_FOR_WORKING,
+                labelWorkingTime);
+        this.configureSlider(this.sliderRestingTime, MIN_RESTING_TIME,
+                MAX_RESTING_TIME, DEFAULT_RESTING_TIME, LABEL_FOR_RESTING,
+                labelRestingTime);
+        this.configureSlider(this.sliderBigRestingTime, MIN_BIG_RESTING_TIME,
+                MAX_BIG_RESTING_TIME, DEFAULT_BIG_RESTING_TIME, LABEL_FOR_BIG_REST,
+                labelBigRestingTime);
     }
 
+    //FIXME: Too many arguments
     private void configureSlider(Slider slider, Integer min, Integer max, Integer defaultValue, String labelText, Label label) {
         slider.setMin(min);
         slider.setMax(max);
@@ -429,12 +439,13 @@ public class MainController {
         }
     }
 
+    //TODO: Move it to another class
     private void showFinishDialogFor(TimerMode finishedMode) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Time is up!");
+        alert.setTitle(LABEL_FOR_TITLE_TIME_UP);
         alert.setHeaderText(null);
         alert.setContentText(MessageFormat.
-                format("{0} time has finished!",
+                format(LABEL_FOR_MSG_TIME_UP,
                         finishedMode.getName()));
         alert.show();
     }
@@ -452,7 +463,12 @@ public class MainController {
         }
     }
 
-    public void doReset(ActionEvent actionEvent) {
+    /**
+     * Method invoked by reset button.
+     * @param actionEvent action
+     */
+    @FXML
+    void doReset(ActionEvent actionEvent) {
         this.timerSeconds = 0;
         this.establishCurrentMode(TimerMode.STAND_BY);
         this.labelCountDown.setText("");
