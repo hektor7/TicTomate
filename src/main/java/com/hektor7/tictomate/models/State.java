@@ -5,16 +5,18 @@ import com.hektor7.tictomate.enums.TimerMode;
 /**
  * Created by hector on 4/10/15.
  */
-public class State implements  Comparable<State>{
+public class State implements Comparable<State> {
 
     TimerMode mode;
     Long totalSeconds;
     Integer order;
+    Integer numberOfPomodoro;
 
-    public State(TimerMode mode, Long totalSeconds, Integer order) {
+    public State(TimerMode mode, Long totalSeconds, Integer order, Integer numberOfPomodoro) {
         this.mode = mode;
         this.totalSeconds = totalSeconds;
         this.order = order;
+        this.numberOfPomodoro = numberOfPomodoro;
     }
 
     public TimerMode getMode() {
@@ -39,6 +41,14 @@ public class State implements  Comparable<State>{
 
     public void setOrder(Integer order) {
         this.order = order;
+    }
+
+    public Integer getNumberOfPomodoro() {
+        return numberOfPomodoro;
+    }
+
+    public void setNumberOfPomodoro(Integer numberOfPomodoro) {
+        this.numberOfPomodoro = numberOfPomodoro;
     }
 
     @Override
