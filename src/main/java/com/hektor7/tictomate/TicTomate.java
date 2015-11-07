@@ -25,16 +25,12 @@ public class TicTomate extends Application {
         Parent root = FXMLLoader.load(FXMLPage.MAIN.getPageUrl());
 
 
-        Scene scene = this.isDesktop() ? new Scene(root) : createSceneForMobile(root);
+        Scene scene = PlatformFactory.isDesktop() ? new Scene(root) : createSceneForMobile(root);
 
         stage.setScene(scene);
         stage.setTitle("TicTomate v0.1");
         stage.setResizable(false);
         stage.show();
-    }
-
-    private boolean isDesktop() {
-        return "desktop".equals(System.getProperty("javafx.platform", "desktop"));
     }
 
     private Scene createSceneForMobile(Parent root) {

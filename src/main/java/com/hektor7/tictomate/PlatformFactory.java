@@ -40,6 +40,6 @@ public class PlatformFactory {
     }
 
     public static boolean isDesktop(){
-        return "Destop".equals(getName());
+        return "Desktop".equals(getName());
     }
 }
