@@ -26,25 +26,25 @@ import java.util.concurrent.TimeUnit;
 //TODO: Create a SoundService or AlertService and create an implementation for desktop and android
 public class MainController {
 
-    private Integer MIN_POMODOROS = 1;
-    private Integer MAX_POMODOROS = 20;
-    private Integer DEFAULT_POMODOROS = 1;
-    private Integer MAX_WORKING_TIME = 120;
-    private Integer MIN_WORKING_TIME = 1;
-    private Integer DEFAULT_WORKING_TIME = 25;
-    private Integer MAX_RESTING_TIME = 60;
-    private Integer MIN_RESTING_TIME = 1;
-    private Integer DEFAULT_RESTING_TIME = 5;
-    private Integer MAX_BIG_RESTING_TIME = 120;
-    private Integer MIN_BIG_RESTING_TIME = 1;
-    private Integer DEFAULT_BIG_RESTING_TIME = 15;
-    private String LABEL_FOR_POMODOROS = "No. Pomodoros: {0}";
-    private String LABEL_FOR_WORKING = "Working time: {0}";
-    private String LABEL_FOR_RESTING = "Resting time: {0}";
-    private String LABEL_FOR_BIG_REST = "Big rest time: {0}";
-    private String LABEL_FOR_COUNTDOWN = "{0}:{1} left. Pomodoro No. {2} of {3}";
-    private String LABEL_FOR_TITLE_TIME_UP = "Time is up!";
-    private String LABEL_FOR_MSG_TIME_UP = "{0} time has finished!";
+    private final Integer MIN_POMODOROS = 1;
+    private final Integer MAX_POMODOROS = 20;
+    private final Integer DEFAULT_POMODOROS = 1;
+    private final Integer MAX_WORKING_TIME = 120;
+    private final Integer MIN_WORKING_TIME = 1;
+    private final Integer DEFAULT_WORKING_TIME = 25;
+    private final Integer MAX_RESTING_TIME = 60;
+    private final Integer MIN_RESTING_TIME = 1;
+    private final Integer DEFAULT_RESTING_TIME = 5;
+    private final Integer MAX_BIG_RESTING_TIME = 120;
+    private final Integer MIN_BIG_RESTING_TIME = 1;
+    private final Integer DEFAULT_BIG_RESTING_TIME = 15;
+    private final String LABEL_FOR_POMODOROS = "No. Pomodoros: {0}";
+    private final String LABEL_FOR_WORKING = "Working time: {0}";
+    private final String LABEL_FOR_RESTING = "Resting time: {0}";
+    private final String LABEL_FOR_BIG_REST = "Big rest time: {0}";
+    private final String LABEL_FOR_COUNTDOWN = "{0}:{1} left. Pomodoro No. {2} of {3}";
+    private final String LABEL_FOR_TITLE_TIME_UP = "Time is up!";
+    private final String LABEL_FOR_MSG_TIME_UP = "{0} time has finished!";
 
     @FXML
     private ResourceBundle resources;
