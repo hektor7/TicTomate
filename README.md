@@ -15,6 +15,6 @@ I created this app with JavaFx 8 because I use this app on my desktop when I'm p
 
 ## What else about this app?
 
-This app is created with JavaFx 8, if you want to run it on your desktop you can download the last jar file from [here](https://github.com/hektor7/TicTomate/releases) and run it (you will need JRE 8).
+This app is created with JavaFx 8, if you want to run it on your desktop you can download the last jar file from **[here](https://github.com/hektor7/TicTomate/releases)** and run it (you will need JRE 8).
 
-This app can run on Android too but this version has many errors and I have no published any release yet.
+This app can run on Android too but this version has major limitations and I have no published any release yet.
