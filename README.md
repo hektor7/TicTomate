@@ -1,5 +1,6 @@
 # TicTomate
 My own JavaFx 8 app for Pomodoro's working technique.
+If you don't want to read all... [Go to download page :)](https://github.com/hektor7/TicTomate/releases)
 
 ## What is The Pomodoro Technique?
 
