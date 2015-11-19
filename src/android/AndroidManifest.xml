@@ -6,7 +6,8 @@
         <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
         <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="21"/>
         <application android:label="TicTomate" android:name="android.support.multidex.MultiDexApplication" android:icon="@mipmap/ic_launcher">
-                <activity android:name="javafxports.android.FXActivity" android:label="TicTomate" android:configChanges="orientation|screenSize">
+                <activity android:name="javafxports.android.FXActivity" android:label="TicTomate" android:configChanges="orientation|screenSize"
+                          android:screenOrientation="portrait">
                         <meta-data android:name="main.class" android:value="com.hektor7.tictomate.TicTomate"/>
                         <meta-data android:name="debug.port" android:value="0"/>
                         <intent-filter>

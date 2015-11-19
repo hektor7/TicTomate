@@ -288,6 +288,7 @@ public class MainController {
         slider.setBlockIncrement(1);
         slider.setMinorTickCount(1);
         slider.setMajorTickUnit(1);
+        slider.setSnapToTicks(true);
 
         label.setText(MessageFormat.format(labelText, Double.valueOf(slider.getValue()).intValue()));
 
@@ -370,7 +371,20 @@ public class MainController {
     private void establishCurrentMode(TimerMode currentMode) {
         this.labelState.setText(currentMode.getName());
         this.configureButtonsFor(currentMode);
-        this.setEnableSpinners(currentMode.isEnabledControls());
+        this.setEnableControls(currentMode.isEnabledControls());
+    }
+
+    private void setEnableControls(boolean isEnabled) {
+        if (PlatformFactory.isDesktop())
+            this.setEnableSpinners(isEnabled);
+        else this.setEnableSliders(isEnabled);
+    }
+
+    private void setEnableSliders(boolean isEnabled) {
+        this.sliderPomodoros.setDisable(!isEnabled);
+        this.sliderBigRestingTime.setDisable(!isEnabled);
+        this.sliderRestingTime.setDisable(!isEnabled);
+        this.sliderWorkingTime.setDisable(!isEnabled);
     }
 
     private void configureButtonsFor(TimerMode currentMode) {

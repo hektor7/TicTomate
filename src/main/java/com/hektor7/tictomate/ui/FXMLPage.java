@@ -22,7 +22,6 @@ public enum FXMLPage {
      */
     public URL getPageUrl() {
         return getClass().getResource(this.page);
-
     }
 }
 
