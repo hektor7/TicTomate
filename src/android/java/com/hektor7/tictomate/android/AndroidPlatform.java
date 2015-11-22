@@ -11,6 +11,7 @@ import javafxports.android.FXActivity;
  * Created by hector on 7/11/15.
  */
 public class AndroidPlatform implements Platform {
+    
 
     @Override
     public void warnForFinish(TimerMode finishedMode) {

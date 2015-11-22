@@ -4,6 +4,11 @@ import com.hektor7.tictomate.PlatformFactory;
 import com.hektor7.tictomate.enums.TimerMode;
 import com.hektor7.tictomate.models.State;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableStringValue;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -24,7 +29,6 @@ import java.util.concurrent.TimeUnit;
  * Created by hector on 27/09/15.
  */
 
-//TODO: Create a SoundService or AlertService and create an implementation for desktop and android
 public class MainController {
 
     private final Integer MIN_POMODOROS = 1;
@@ -260,11 +264,11 @@ public class MainController {
     }
 
     private void configureMobileControls() {
-        this.mainPane.setPrefHeight(this.getScreenHeight());
-        this.mainPane.setPrefWidth(this.getScreenWidth());
-        this.mainVBox.setPrefHeight(this.getScreenHeight());
-        this.mainVBox.setPrefWidth(this.getScreenWidth());
-        this.progressIndicator.setMaxWidth(this.getScreenWidth());
+        this.mainPane.setPrefHeight(Screen.getPrimary().getVisualBounds().getHeight());
+        this.mainPane.setPrefWidth(Screen.getPrimary().getVisualBounds().getWidth());
+        this.mainVBox.setPrefHeight(Screen.getPrimary().getVisualBounds().getHeight());
+        this.mainVBox.setPrefWidth(Screen.getPrimary().getVisualBounds().getWidth());
+        this.progressIndicator.setMaxWidth(Screen.getPrimary().getVisualBounds().getWidth());
 
         this.configureSlider(this.sliderPomodoros, MIN_POMODOROS,
                 MAX_POMODOROS, DEFAULT_POMODOROS, LABEL_FOR_POMODOROS,
@@ -295,14 +299,6 @@ public class MainController {
         slider.valueProperty().addListener((observable, oldValue, newValue) -> {
             label.setText(MessageFormat.format(labelText, newValue.intValue()));
         });
-    }
-
-    private double getScreenWidth() {
-        return Screen.getPrimary().getVisualBounds().getWidth();
-    }
-
-    private double getScreenHeight() {
-        return Screen.getPrimary().getVisualBounds().getHeight();
     }
 
     private void hideDesktopControls() {
