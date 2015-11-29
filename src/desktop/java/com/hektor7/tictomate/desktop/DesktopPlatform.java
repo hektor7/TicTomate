@@ -4,6 +4,7 @@ import com.hektor7.tictomate.Platform;
 import com.hektor7.tictomate.enums.TimerMode;
 import javafx.scene.control.Alert;
 import javafx.scene.media.Media;
+import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
 
 import java.net.URI;
@@ -41,8 +42,9 @@ public class DesktopPlatform implements Platform {
             MediaPlayer audio = new MediaPlayer(
                     new Media(uri.toString()));
             audio.play();
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException|MediaException e) {
             //FIXME: Show error
+            e.printStackTrace();
         }
     }
 }
